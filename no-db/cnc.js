@@ -14,7 +14,7 @@ const heroes = [warrior, wizard, rogue];
 // Array of monsters
 const skeleton = new Monster("Skeleton", 12, 0, 1, 3, ["cloth scraps", "useless bone", "rusty dagger"], 0, "The monster is completely silent");
 const ogre = new Monster("Ogre", 24, 0, 3, 6, ["stale bread", "onions"], 0, "U no take onion!");
-const dragon = new Monster("Dragon", 240, 10, 14, 28, ["golden sword", "large diamond"], 1000, "The dragon lets out a ferocious, earth-shaking roar");
+const dragon = new Monster("Dragon", 240, 10, 14, 28, ["golden sword", "large diamond"], 1000, "The dragon lets out a terrible, earth-shaking roar");
 
 const monsters = [skeleton, ogre, dragon];
 
