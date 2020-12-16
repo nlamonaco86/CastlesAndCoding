@@ -9,7 +9,7 @@ let hero = new Schema({
   xp: Number,
   level: Number,
   class: { type: String },
-  weapon: { name: { type: String, required: true }, damageLow: Number, damageHigh: Number, type: { type: String } },
+  weapon: {},
   spells: [],
   inventory: [],
   gold: Number,

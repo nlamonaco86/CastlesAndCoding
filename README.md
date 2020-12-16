@@ -6,6 +6,8 @@ Text-based role-playing in Node.js with MongoDB & Mongoose. It makes use of whil
 As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an homage to classic text-based roleplaying games of the past.
 ```
 
+C&C is currently played entirely from the command line in your Node.js console. Future developments will include a front end inspired by MS-DOS era text-based games. 
+
 ## Text-Based Character and Monster Creation
 
 Users can manually create hero and monster characters complete with their own stats, equipment, inventory, and gold, using the provided functions, all from Node.js.
@@ -26,6 +28,21 @@ The "combat" system includes random chances for both heroes and monsters to bloc
 
 A simplified version of the game, requiring no database, is also provided.
 
+## Instructions
+
+Simply clone the repository, in your MongoDB shells, create a database called 
+
+```
+cncDb
+```
+
+Then, navigate to to ./CLI
+```
+node cnc
+```
+
+[Have fun storming the castle!](https://www.youtube.com/watch?v=AjUmULa0R-8)
+
 ## Future Development
 - Battle multiple heroes against a single, more powerful monster i.e. a Dragon.
 - More extensive combat system, incorporating spells and more.
@@ -36,4 +53,5 @@ A simplified version of the game, requiring no database, is also provided.
 - Robust documentation for all aspects of the game.
 
 ![screenshot](./screenshot.png)
-![screenshot2](./screenshot2.png)
+![screenshot2](./screenshot4.png)
+![screenshot2](./screenshot3.png)
