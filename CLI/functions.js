@@ -117,7 +117,7 @@ const epicShowdown = (hero, monster) => {
             // Create an object to display in the console
             let heroWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, taunt: monster.taunt, combatLog: battleStatus, victory: true, message: `${hero.name} has slain the ${monster.name}!`, loot: [monsterDeath(monster), monster.gold] }
             // Also use that object to populate the database 
-            db.Battle.create(heroWins).then(result => {  });
+            db.Battle.create(heroWins).then(result => { });
             // The hero gains all of the monster's gold
             transferItem(hero._id, db.Hero, monster._id, db.Monster, "gold", "all");
             return heroWins
@@ -125,7 +125,7 @@ const epicShowdown = (hero, monster) => {
         // Defeat :(
         if (heroLife <= 0) {
             let monsterWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, taunt: monster.taunt, combatLog: battleStatus, victory: false, message: `${hero.name} has been defeated by the ${monster.name}!`, lastWords: heroDeath(hero) }
-            db.Battle.create(monsterWins).then(result => {  });
+            db.Battle.create(monsterWins).then(result => { });
             // Lose 30 gold on death to a monster
             transferItem(monster._id, db.Monster, hero._id, db.Hero, "penalty", 30);
             return monsterWins
@@ -137,11 +137,11 @@ const epicShowdown = (hero, monster) => {
 const chooseTwo = async function (heroWhere, monsterWhere) {
     let hero = await db.Hero.findOne(heroWhere);
     let monster = await db.Monster.findOne(monsterWhere);
-    if (monster === null) { 
+    if (monster === null) {
         monster = createRandomMonster(hero);
         console.log(epicShowdown(hero, monster));
     }
-    else { 
+    else {
         console.log(epicShowdown(hero, monster));
     }
 }
@@ -282,7 +282,7 @@ const createMonster = () => {
             gold: answers.gold,
             taunt: answers.taunt
         }).then(monster => {
-            let result = {name: monster.name, hp: monster.hp, armor: monster.armor, level: monster.level, damage: `${monster.damageLow}-${monster.damageHigh}`, gold: monster.gold, taunt: monster.taunt}
+            let result = { name: monster.name, hp: monster.hp, armor: monster.armor, level: monster.level, damage: `${monster.damageLow}-${monster.damageHigh}`, gold: monster.gold, taunt: monster.taunt }
             console.table(result);
             inquirer.prompt([
                 {
@@ -303,7 +303,7 @@ const createMonster = () => {
 
 const addHeroToDb = (name, hp, armor, occupation, weapon, spells, lastWords) => {
     db.Hero.create({ name: name, sprite: "URL", hp: hp, armor: armor, xp: 0, level: 1, class: occupation, weapon: weapon, spells: spells, inventory: [], gold: 10, lastWords: lastWords }).then((hero) => {
-        let result = {name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, inventory: hero.inventory.join(", "), lastWords: hero.lastWords}
+        let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, inventory: hero.inventory.join(", "), lastWords: hero.lastWords }
         console.table(result);
     });
 };
@@ -366,6 +366,115 @@ const createHero = () => {
             else { process.exit(1); }
         })
     }).catch(error => { console.log(error) })
-}
+};
 
-module.exports = { createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, createHero, createMonster, addHeroToDb }
+let selectedDungeon;
+
+createDungeon = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "Enter the Dungeon's Name:",
+            name: "name",
+        },
+        {
+            type: "input",
+            message: "Describe the Dungeon",
+            name: "description",
+        },
+        {
+            type: "number",
+            message: "Dungeon level:",
+            name: "level",
+        },
+        {
+            type: "input",
+            message: "What treasure can be found in the dungeon?",
+            name: "treasure",
+        },
+        {
+            type: "number",
+            message: "How much gold is in the dungeon?",
+            name: "gold",
+        }
+    ]).then(answers => {
+        db.Dungeon.create(answers).then(result => {
+            selectedDungeon = result
+            console.log("dungeon created");
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "Enter the Boss's name:",
+                    name: "name",
+                },
+                {
+                    type: "number",
+                    message: "Boss's HP:",
+                    name: "hp",
+                },
+                {
+                    type: "number",
+                    message: "Boss's Armor:",
+                    name: "armor",
+                },
+                {
+                    type: "number",
+                    message: "Boss's level:",
+                    name: "level",
+                },
+                {
+                    type: "number",
+                    message: "Boss's Minimum damage:",
+                    name: "damageLow",
+                },
+                {
+                    type: "number",
+                    message: "Boss's Maximum damage:",
+                    name: "damageHigh",
+                },
+                {
+                    type: "number",
+                    message: "Boss's Gold:",
+                    name: "gold",
+                },
+                {
+                    type: "input",
+                    message: "Boss's opening message:",
+                    name: "taunt",
+                }
+            ]).then(answers => {
+                // is this "callback hell"? 
+                db.Monster.create({
+                    _id: uuidv4(),
+                    name: answers.name,
+                    sprite: "placeholder URL",
+                    hp: answers.hp,
+                    armor: answers.armor,
+                    level: answers.level,
+                    damageLow: answers.damageLow,
+                    damageHigh: answers.damageHigh,
+                    gold: answers.gold,
+                    taunt: answers.taunt
+                }).then(result => {
+                    db.Dungeon.findOneAndUpdate({ _id: selectedDungeon._id }, { boss: result }, { new: true }).then(result => {
+                        db.Monster.find({}).then(results => {
+                            inquirer.prompt([
+                                {
+                                    type: "checkbox",
+                                    message: "Choose Monsters to live in the dungeon:",
+                                    choices: results.map(x => `${x.name} - Level ${x.level}`),
+                                    name: "monsters",
+                                }]).then(choices => {
+                                    db.Dungeon.findOneAndUpdate({ _id: selectedDungeon._id }, { monsters: choices.monsters }, { new: true }).then(result => {
+                                        console.log(result)
+                                    })
+                                });
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
+module.exports = { createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, createHero, createMonster, createDungeon, addHeroToDb }

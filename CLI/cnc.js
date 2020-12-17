@@ -23,7 +23,7 @@ const mainMenu = () => {
                     {
                         type: "list",
                         message: "What would you like to create?",
-                        choices: ["Hero", "Monster"],
+                        choices: ["Hero", "Monster", "Dungeon"],
                         name: "choice",
                     }
                 ]).then(select => {
@@ -33,6 +33,9 @@ const mainMenu = () => {
                             break;
                         case "Monster":
                             fn.createMonster();
+                            break;
+                        case "Dungeon":
+                            fn.createDungeon();
                     }
                 })
                 break;
