@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const db = require("../models");
 const { v4: uuidv4 } = require('uuid');
-let inquirer = require('inquirer');
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -34,14 +33,14 @@ const createRandomMonster = (hero) => {
     monsterData = {
         _id: uuidv4(),
         name: "Wretched Ooze",
-        hp: Math.floor(Math.random() * hero.hp * 2),
-        xp: Math.floor((Math.random() * hero.xp) + 1),
+        hp: Math.floor(Math.random() * hero.hp * 4),
+        xp: Math.floor((Math.random() * hero.level) + 4),
         level: hero.level,
         armor: Math.floor(Math.random() * hero.armor * 2),
-        damageLow: Math.floor(Math.random() * hero.weapon.damageLow * 1.5),
-        damageHigh: Math.floor(Math.random() * hero.weapon.damageHigh * 1.5),
-        critChance: Math.floor(Math.random() * hero.critChance * 1.5),
-        blockChance: Math.floor(Math.random() * hero.blockChance * 1.5),
+        damageLow: Math.floor(Math.random() * hero.weapon.damageLow * 2),
+        damageHigh: Math.floor(Math.random() * hero.weapon.damageHigh * 2),
+        critChance: Math.floor(Math.random() * hero.critChance * 2),
+        blockChance: Math.floor(Math.random() * hero.blockChance * 2),
         inventory: ["disgusting slime", { name: "rusted sword", damageLow: 0, damageHigh: 2 }, "crumpled map"],
         gold: Math.floor(Math.random() * 50),
         taunt: "A shifting blob of mysterious ooze comes forth."
@@ -54,12 +53,37 @@ const createRandomMonster = (hero) => {
 
 // Calculate damage to deal
 let calcHeroDamage = (model) => {
+    // empty array will hold all possible damage outcomes from the weapon/spell
     let possibleDamage = [];
-    for (let i = model.weapon.damageLow; i <= model.weapon.damageHigh; i++) {
-        possibleDamage.push(i);
+    // Different heroes use different abilities - warrior and thief use their weapon
+    // 4 if conditions here, so the four classes can become more unique as development continues
+    if (model.class === "Warrior") {
+        for (let i = model.weapon.damageLow; i <= model.weapon.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
     }
+    if (model.class === "Thief") {
+        for (let i = model.weapon.damageLow; i <= model.weapon.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
+    }
+    // cleric and wizard use random spells from their "Spellbook" array
+    if (model.class === "Wizard") {
+        let chosenSpell =  model.spells[Math.floor(Math.random() * model.spells.length)]
+        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
+    }
+    if (model.class === "Cleric") {
+        let chosenSpell =   model.spells[Math.floor(Math.random() * model.spells.length)]
+        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
+    }
+    // grab a random number from the array - that's the damage to be dealt
     return possibleDamage[Math.floor(Math.random() * possibleDamage.length)];
 }
+
 let calcMonsterDamage = (model) => {
     let possibleDamage = [];
     for (let i = model.damageLow; i <= model.damageHigh; i++) {
@@ -183,7 +207,7 @@ const chronicle = (status, score) => {
     console.log(status.combatLog);
     console.log(status.message);
     if (status.lastWords) { console.log('"' + status.lastWords + '"') };
-    if (status.loot || status.gold ) { console.log(`${status.monster.name} dropped ${ status.loot.name || status.loot} and ${status.gold} gold. ${status.hero.name} gained ${status.xp} xp.`) }
+    if (status.loot || status.gold) { console.log(`${status.monster.name} dropped ${status.loot.name || status.loot} and ${status.gold} gold. ${status.hero.name} gained ${status.xp} xp.`) }
     if (score < 1 || score > 1) { console.log(`${status.hero.name} defeated ` + score + " monsters."); }
     if (score === 1) { console.log(`${status.hero.name} defeated ` + score + " monster."); }
 }
@@ -210,7 +234,7 @@ const combatLog = (where) => {
 // Hero character gains all of the monster's gold and xp, plus a random item from its inventory
 // The monster is left unmodified so that it can be re-used
 const lootMonster = (hero, monster, loot) => {
-        db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold }, $inc: { xp: monster.xp}, $push: { inventory: loot } }, { new: true }).then(result => {
+    db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold }, $inc: { xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(result => {
     });
 };
 

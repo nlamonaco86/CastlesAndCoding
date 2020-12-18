@@ -1,6 +1,8 @@
 # Castles & Coding
 
-Text-based role-playing in Node.js with MongoDB & Mongoose. It makes extensive use of while loops, prototype and math to provide the basis of a classic tabletop roleplaying experience. 
+Text-based role-playing in Node.js with MongoDB & Mongoose.
+
+It makes extensive use of while loops, Javascript's prototype, and the Math object to provide the basis of a classic tabletop roleplaying experience. 
 
 ```
 As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an homage 
@@ -9,9 +11,9 @@ to classic text-based roleplaying games of the past.
 
 C&C is currently played entirely from the command line in your Node.js console. Future developments will include a front end inspired by MS-DOS era text-based games. 
 
-## Text-Based Character, Monster
+## Text-Based Character & Monster Creation
 
-Players can manually create hero and monster characters complete with their own stats, equipment, inventory, and gold, using the provided functions, all from Node.js.
+Players can create personalized hero and monster characters complete with their own stats, equipment, inventory, and gold, using the provided functions, all from Node.js.
 
 Monsters can also be randomly generated and will scale with the hero's stats - the stronger the hero, the more fearsome the monsters will be.
 
@@ -50,12 +52,11 @@ node cnc
 
 ## Future Development
 - Battle multiple heroes against a single, more powerful monster i.e. a Dragon.
-- More extensive combat system, incorporating spells and more.
 
 - Create a front-end UI styled after classic text-based role-playing computer games.  
 - Turn-based structure to the game for a more laid-back user experience. 
 
-- Robust documentation for all aspects of the game.
+- Robust documentation for all aspects of how to play the game.
 
 ![screenshot](./screenshot.png)
 ![screenshot2](./screenshot4.png)
