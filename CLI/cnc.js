@@ -2,7 +2,8 @@ let inquirer = require('inquirer');
 const mongoose = require("mongoose");
 const db = require("../models");
 const { v4: uuidv4 } = require('uuid');
-const fn = require("./functions")
+const cli = require("./cli-functions");
+const fn = require("./functions");
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -29,13 +30,13 @@ const mainMenu = () => {
                 ]).then(select => {
                     switch (select.choice) {
                         case "Hero":
-                            fn.createHero();
+                            cli.createHero();
                             break;
                         case "Monster":
-                            fn.createMonster();
+                            cli.createMonster();
                             break;
                         case "Dungeon":
-                            fn.createDungeon();
+                            cli.createDungeon();
                     }
                 })
                 break;

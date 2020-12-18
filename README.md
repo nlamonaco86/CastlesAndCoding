@@ -15,7 +15,7 @@ Players can manually create hero and monster characters complete with their own 
 
 Monsters can also be randomly generated and will scale with the hero's stats - the stronger the hero, the more fearsome the monsters will be.
 
-Players can also create Non-Payer Characters with their own items, inventory, and things to say. 
+Players can also create Non-Player Characters with their own items, inventory, and things to say. 
 
 ## Combat and Loot System
 
@@ -23,7 +23,7 @@ Players can battle a specific hero against a specific monster one time, or battl
 
 Records of each battle are displayed in the console, and kept in the database for later viewing.
 
-The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold and items upon defeat, which will then transfer to the hero's inventory. 
+The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. 
 
 ## Design Your Own Dungeons
 

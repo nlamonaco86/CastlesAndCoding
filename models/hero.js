@@ -9,6 +9,8 @@ let hero = new Schema({
   xp: Number,
   level: Number,
   class: { type: String },
+  blockChance: Number,
+  critChance: Number, 
   weapon: {},
   spells: [],
   inventory: [],
