@@ -205,9 +205,9 @@ const mainMenu = () => {
                                     });
                                 });
                             });
-                        break;
+                            break;
                         case "Raid a Dungeon":
-                            db.Party.find({}).then(parties =>{
+                            db.Party.find({}).then(parties => {
                                 inquirer.prompt([
                                     {
                                         type: "list",
@@ -219,7 +219,7 @@ const mainMenu = () => {
                                     db.Party.findOne({ name: result.choice }).then(party => {
                                         partyName = party.name
                                         party.heroes.forEach(hero => {
-                                        // find each hero in the party, and push it to the temp array
+                                            // find each hero in the party, and push it to the temp array
                                             db.Hero.findOne({ name: hero.split(" ")[0], level: hero.split(" ")[3] }).then(hero => {
                                                 selectedHeroes.push(hero)
                                             })
@@ -241,39 +241,55 @@ const mainMenu = () => {
                                                     let partyOfHeroes = {
                                                         _id: selectedHeroes.map(h => h._id),
                                                         name: partyName,
-                                                        hp: selectedHeroes.map(h => h.hp ).reduce((a, b) => { return a + b; }, 0),
-                                                        xp: selectedHeroes.map(h => h.xp ).reduce((a, b) => { return a + b; }, 0),
-                                                        armor: selectedHeroes.map(h => h.armor ).reduce((a, b) => { return a + b; }, 0),
+                                                        hp: selectedHeroes.map(h => h.hp).reduce((a, b) => { return a + b; }, 0),
+                                                        xp: selectedHeroes.map(h => h.xp).reduce((a, b) => { return a + b; }, 0),
+                                                        armor: selectedHeroes.map(h => h.armor).reduce((a, b) => { return a + b; }, 0),
                                                         class: selectedHeroes.map(h => h.class),
                                                         // for crit/block, use the average of all the characters' chances
-                                                        critChance: Math.floor( selectedHeroes.map(h => h.critChance ).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
-                                                        blockChance: Math.floor( selectedHeroes.map(h => h.blockChance ).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
+                                                        critChance: Math.floor(selectedHeroes.map(h => h.critChance).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
+                                                        blockChance: Math.floor(selectedHeroes.map(h => h.blockChance).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
                                                         // create a weapon that's the combination of all heroe' weapons
                                                         weapon: {
                                                             name: "The Party's Blade",
-                                                            damageLow: selectedHeroes.map(h => h.weapon.damageLow ).reduce((a, b) => { return a + b; }, 0),
-                                                            damageHigh: selectedHeroes.map(h => h.weapon.damageHigh ).reduce((a, b) => { return a + b; }, 0)
+                                                            damageLow: selectedHeroes.map(h => h.weapon.damageLow).reduce((a, b) => { return a + b; }, 0),
+                                                            damageHigh: selectedHeroes.map(h => h.weapon.damageHigh).reduce((a, b) => { return a + b; }, 0)
                                                         },
                                                         // for spells, create a spell much like the weapon
                                                         spells: [{
                                                             name: "The Might of Magic",
-                                                            damageLow: selectedHeroes.map(h => h.spells[0].damageLow ).reduce((a, b) => { return a + b; }, 0),
-                                                            damageHigh: selectedHeroes.map(h => h.spells[0].damageHigh ).reduce((a, b) => { return a + b; }, 0)
+                                                            damageLow: selectedHeroes.map(h => h.spells[0].damageLow).reduce((a, b) => { return a + b; }, 0),
+                                                            damageHigh: selectedHeroes.map(h => h.spells[0].damageHigh).reduce((a, b) => { return a + b; }, 0)
                                                         }],
-                                                        gold: selectedHeroes.map(h => h.gold ).reduce((a, b) => { return a + b; }, 0),
+                                                        gold: selectedHeroes.map(h => h.gold).reduce((a, b) => { return a + b; }, 0),
                                                         inventory: [],
                                                         lastWords: ""
                                                     };
                                                     // provide incentives for making a diverse group of heroes. A warrior in the party will add extra armor, a thief extra weapon damage, 
                                                     // a cleric, extra hp, and a wizard extra spell damage 
-                                                    console.log(fn.epicShowdown(partyOfHeroes, selectedDungeon.boss));
+                                                    if (partyOfHeroes.class.includes("Warrior")) {
+                                                        partyOfHeroes.armor *= 1.1; partyOfHeroes.blockChance *= 1.1;
+                                                        console.log(`${partyOfHeroes.name} gains 10% armor and block chance!`)
+                                                    }
+                                                    if (partyOfHeroes.class.includes("Wizard")) {
+                                                        partyOfHeroes.spells[0].damageLow *= 1.1; partyOfHeroes.spells[0].damageHigh *= 1.1;
+                                                        console.log(`${partyOfHeroes.name} gains 10% spell damage!`)
+                                                    }
+                                                    if (partyOfHeroes.class.includes("Thief")) {
+                                                        partyOfHeroes.weapon.damageLow *= 1.1; partyOfHeroes.weapon.damageHigh *= 1.1;
+                                                        console.log(`${partyOfHeroes.name} gains 10% weapon damage!`)
+                                                    }
+                                                    if (partyOfHeroes.class.includes("Cleric")) { 
+                                                        partyOfHeroes.hp *= 1.1; 
+                                                        console.log(`${partyOfHeroes.name} gains 10% hp!`) 
+                                                    }
+                                                    fn.chronicle(fn.epicShowdown(partyOfHeroes, selectedDungeon.boss));
                                                 });
                                             });
                                         });
                                     });
                                 });
                             });
-                         ;
+                            ;
                     };
                 });
                 break;

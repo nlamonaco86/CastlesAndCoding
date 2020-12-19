@@ -155,8 +155,8 @@ const epicShowdown = (hero, monster) => {
 
         // Run the critical hit calculation, and if true, alter this turn's results
         // If the resulting damage is not negative, alter the life totals
-        if (dmgIn.dmg >= 0) { heroLife = heroLife - dmgIn.dmg }
-        if (dmgOut.dmg >= 0) { monsterLife = monsterLife - dmgOut.dmg }
+        if (dmgIn.dmg >= 0) { heroLife = Math.round(heroLife - dmgIn.dmg) }
+        if (dmgOut.dmg >= 0) { monsterLife = Math.round(monsterLife - dmgOut.dmg) }
         // Push each "turn" taken to the array, log crit messages and prevent logging "junk" negative crits
         if (dmgIn.msg && dmgIn.dmg >= 0) { battleStatus.push(dmgIn.msg) }
         if (dmgOut.msg && dmgOut.dmg >= 0) { battleStatus.push(dmgOut.msg) }
@@ -174,13 +174,13 @@ const epicShowdown = (hero, monster) => {
                 db.Battle.create(heroWins).then(result => {
                 });
                 lootMonster(hero, monster, loot);
-                return heroWins
+                return heroWins;
             }
             // Loot is not supported for raid battles (yet)
             else {
                 db.Battle.create(heroWins).then(result => {
                 });
-                return heroWins
+                return heroWins;
             }
 
         }
@@ -231,7 +231,9 @@ const chronicle = (status, score) => {
     console.log(status.combatLog);
     console.log(status.message);
     if (status.lastWords) { console.log('"' + status.lastWords + '"') };
-    if (status.loot || status.gold) { console.log(`${status.monster.name} dropped ${status.loot.name || status.loot} and ${status.gold} gold. ${status.hero.name} gained ${status.xp} xp.`) }
+    if (!Array.isArray(status.hero.class)) {
+        if (status.loot || status.gold) { console.log(`${status.monster.name} dropped ${status.loot.name || status.loot} and ${status.gold} gold. ${status.hero.name} gained ${status.xp} xp.`) }
+    }
     if (score < 1 || score > 1) { console.log(`${status.hero.name} defeated ` + score + " monsters."); }
     if (score === 1) { console.log(`${status.hero.name} defeated ` + score + " monster."); }
 }
