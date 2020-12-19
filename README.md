@@ -2,7 +2,7 @@
 
 Text-based role-playing in Node.js with MongoDB & Mongoose.
 
-It makes extensive use of while loops, Javascript's prototype, and the Math object to provide the basis of a classic tabletop roleplaying experience. 
+It makes extensive use of Javascript's prototype, while loops, and the Math object, to provide the basis of a classic tabletop roleplaying experience. 
 
 ```
 As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an homage 
@@ -27,9 +27,11 @@ Records of each battle are displayed in the console, and kept in the database fo
 
 The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. 
 
-## Design Your Own Dungeons
+## Design and Raid Your Own Dungeons
 
 Players can create their own dungeons, with unique descriptions, dungeon bosses, treasures, and minions.
+
+Heroes can form a party in order to confront the powerful boss of a dungeon as a group. 
 
 ## Optional - No DB required
 
@@ -37,10 +39,19 @@ A simplified version of the game, requiring no database, is also provided.
 
 ## Instructions
 
-Simply clone the repository, in your MongoDB shells, create a database called 
+Simply clone the repository, and in the root directory
+```
+npm install
+```
 
+In your MongoDB shell, create a database called 
 ```
 cncDb
+```
+
+Navigate to to ./seeds
+```
+node seed
 ```
 
 Then, navigate to to ./CLI
@@ -50,10 +61,13 @@ node cnc
 
 [Have fun storming the castle!](https://www.youtube.com/watch?v=AjUmULa0R-8)
 
-## Future Development
-- Battle multiple heroes against a single, more powerful monster i.e. a Dragon.
+## Character design
 
-- Create a front-end UI styled after classic text-based role-playing computer games.  
+A tabletop RPG is less a of a game and more of a framework and set of tools - though seed data is provided for an example of play, you're encouraged to create your own heroes, monsters, and dungeons. You can modify the hero and monster stats and rewards calculations for a unique and endless experience. 
+
+## Future Development
+- Create a front-end UI styled after classic text-based role-playing computer games. 
+ 
 - Turn-based structure to the game for a more laid-back user experience. 
 
 - Robust documentation for all aspects of how to play the game.

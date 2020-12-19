@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const db = require("../models");
 const { v4: uuidv4 } = require('uuid');
+const { clearLine } = require("inquirer/lib/utils/readline");
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -19,6 +20,8 @@ const findAllWhere = (model, where) => {
 const findOne = (model, where) => {
     model.findOne(where).then(result => { console.log(result); });
 };
+
+// findOne(db.Hero, { name: "Merlin"}).then(result=>{console.log(result)})
 
 const updateModel = (model, where, query) => {
     model.findOneAndUpdate(where, query, { new: true }).then(result => { console.log(result); });
@@ -69,14 +72,24 @@ let calcHeroDamage = (model) => {
     }
     // cleric and wizard use random spells from their "Spellbook" array
     if (model.class === "Wizard") {
-        let chosenSpell =  model.spells[Math.floor(Math.random() * model.spells.length)]
+        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
         for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
             possibleDamage.push(i);
         }
     }
     if (model.class === "Cleric") {
-        let chosenSpell =   model.spells[Math.floor(Math.random() * model.spells.length)]
+        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
         for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
+    }
+    else {
+        // This must be a party of heroes! push all possible weapon & spell damage outcomes to the array
+        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
+        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+            possibleDamage.push(i);
+        }
+        for (let i = model.weapon.damageLow; i <= model.weapon.damageHigh; i++) {
             possibleDamage.push(i);
         }
     }
@@ -139,6 +152,7 @@ const epicShowdown = (hero, monster) => {
         // also prevent a character gaining life on negative damage - armor outcomes
         let dmgIn = takeChance(calcMonsterDamage(monster) - hero.armor, monster, hero);
         let dmgOut = takeChance(calcHeroDamage(hero) - monster.armor, hero, monster);
+
         // Run the critical hit calculation, and if true, alter this turn's results
         // If the resulting damage is not negative, alter the life totals
         if (dmgIn.dmg >= 0) { heroLife = heroLife - dmgIn.dmg }
@@ -154,11 +168,21 @@ const epicShowdown = (hero, monster) => {
             let loot = monster.inventory[Math.floor(Math.random() * monster.inventory.length)]
             // Create an object to display in the console
             let heroWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, taunt: monster.taunt, combatLog: battleStatus, victory: true, message: `${hero.name} has slain the ${monster.name}!`, loot: loot, gold: monster.gold, xp: monster.xp }
-            // Also use that object to populate the database 
-            db.Battle.create(heroWins).then(result => {
-            });
-            lootMonster(hero, monster, loot);
-            return heroWins
+            // If the group is NOT a party 
+            if (Array.isArray(hero.class) === false) {
+                // create a battle record in the database, run the loot function
+                db.Battle.create(heroWins).then(result => {
+                });
+                lootMonster(hero, monster, loot);
+                return heroWins
+            }
+            // Loot is not supported for raid battles (yet)
+            else {
+                db.Battle.create(heroWins).then(result => {
+                });
+                return heroWins
+            }
+
         }
         // Defeat :(
         if (heroLife <= 0) {
@@ -181,8 +205,8 @@ const chooseTwo = async function (heroWhere, monsterWhere) {
     }
     else {
         console.log(epicShowdown(hero, monster));
-    }
-}
+    };
+};
 
 // battle against randomly generated monsters until the hero loses
 const untilYouLose = async function (where) {

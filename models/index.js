@@ -5,5 +5,6 @@ module.exports = {
   Hero: require("./hero"),
   Monster: require("./monster"),
   Npc: require("./npc"),
-  Dungeon: require("./dungeon")
+  Dungeon: require("./dungeon"),
+  Party: require("./party")
 };
