@@ -25,13 +25,13 @@ Players can battle a specific hero against a specific monster one time, or battl
 
 Records of each battle are displayed in the console, and kept in the database for later viewing.
 
-The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. 
+The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. Heroes can equip new items they gain from battles.
 
 ## Design and Raid Your Own Dungeons
 
 Players can create their own dungeons, with unique descriptions, dungeon bosses, treasures, and minions.
 
-Heroes can form a party in order to confront the powerful boss of a dungeon as a group. 
+Heroes can form a party in order to confront the powerful boss of a dungeon as a group. The party gains various bonuses based upon its makeup, then raids the dungeon as a group.  
 
 ## Optional - No DB required
 
@@ -73,5 +73,5 @@ A tabletop RPG is less a of a game and more of a framework and set of tools - th
 - Robust documentation for all aspects of how to play the game.
 
 ![screenshot](./screenshot.png)
-![screenshot2](./screenshot4.png)
+![screenshot2](./screenshot5.png)
 ![screenshot2](./screenshot3.png)

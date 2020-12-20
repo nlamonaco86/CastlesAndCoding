@@ -4,7 +4,7 @@ const db = require("../models");
 const { v4: uuidv4 } = require('uuid');
 const cli = require("./cli-functions");
 const fn = require("./functions");
-let questions = require("./questions")
+const ascii = require("./ascii");
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -16,10 +16,11 @@ let selectedDungeon;
 let partyName
 
 const mainMenu = () => {
+    console.log(ascii.main)
     inquirer.prompt([
         {
             type: "list",
-            message: "Castles & Coding",
+            message: "Main Menu",
             choices: ["Create", "View", "Battle", "Edit", "Escape"],
             name: "option",
         }
@@ -73,6 +74,9 @@ const mainMenu = () => {
                                     db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(hero => {
                                         selectedHero = hero
                                         let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
+                                        if (hero.class === "Wizard" ) { console.log(ascii.wizard) }
+                                        if (hero.class === "Warrior" ) { console.log(ascii.warrior) }
+                                        if (hero.class === "Cleric" ) { console.log(ascii.cleric) }
                                         console.table(result);
                                         console.log(`Inventory: ${hero.inventory.join(", ")}`)
                                         inquirer.prompt([
@@ -224,6 +228,7 @@ const mainMenu = () => {
                             });
                             break;
                         case "Raid a Dungeon":
+                            console.log(ascii.dungeon);
                             db.Party.find({}).then(parties => {
                                 inquirer.prompt([
                                     {
@@ -321,6 +326,7 @@ const mainMenu = () => {
                 mainMenu();
                 break;
             case "Escape":
+                console.log("Farewell!");
                 process.exit(1);
         };
     }).catch(error => { console.log(error) })

@@ -20,8 +20,8 @@ let heroSeeds = [
       class: 'Thief',
       weapon: { name: 'iron dagger', damageLow: 8, damageHigh: 12 },   
       critChance: 10,
-      blockChance: 5,
-      gold: -110,
+      blockChance: 15,
+      gold: 0,
       lastWords: 'Ah, but remember faint hearts never won, fair lady.',
     },
     {
@@ -61,27 +61,27 @@ let heroSeeds = [
       weapon: { name: 'short sword', damageLow: 3, damageHigh: 6 },
       critChance: 5,
       blockChance: 10,
-      gold: 10,
+      gold: 0,
       lastWords: 'A glorious death...for Camelot!',
     },
     {
       spells: [ {
         name: "word of power",
-        damageLow: 8,
-        damageHigh: 12
+        damageLow: 6,
+        damageHigh: 10
     } ],
       inventory: [],
       name: 'Geoffrey',
       sprite: 'URL',
       hp: 30,
-      armor: 3,
+      armor: 0,
       xp: 0,
       level: 1,
       class: 'Cleric',
       weapon: { name: 'bronze scepter', damageLow: 1, damageHigh: 3 },
       critChance: 5,
       blockChance: 10,
-      gold: 10,
+      gold: 0,
       lastWords: 'With deep sighs and tears, he burst forth into the following complaint...',
     }
   ]
@@ -89,7 +89,7 @@ let heroSeeds = [
   let monsterSeeds = [
     {
       spells: [],
-      inventory: [ 'rusted dagger', 'rotten bone', 'leather belt' ],
+      inventory: [ {name: "rusted dagger", damageLow: 0, damageHigh: 2 }, 'rotten bone', 'leather belt' ],
       _id: 'd06aa2b9-1d02-46b4-98c2-988b3cc53724',
       name: 'Skeleton',
       sprite: 'placeholder URL',
@@ -108,7 +108,7 @@ let heroSeeds = [
       spells: [],
       inventory: [ { name: 'wooden club', damageLow: 8, damageHigh: 12 }, 'cast-iron pan', 'onion' ],
       _id: '9318bf84-1abe-4f7c-bd36-f66dc565e5ae',
-      name: 'Two-Headed Ogre',
+      name: 'Ogre',
       sprite: 'placeholder URL',
       hp: 40,
       xp: 6,
@@ -157,7 +157,7 @@ let heroSeeds = [
     },
     {
       spells: [],
-      inventory: [ 'brimstone pebblees', 'black book' ],
+      inventory: [ 'brimstone pebblees', 'black book', {name: "Sorceror's Dagger", damageLow: 6, damageHigh: 10} ],
       _id: 'dfa76f05-236f-4304-8595-1073c8db894e',
       name: 'Imp',
       sprite: 'placeholder URL',
@@ -302,6 +302,7 @@ let partySeeds = [
     }
   ]
 
+  db.Battle.deleteMany({}).then(resukt=>{console.log("All battles deleted.")})
   db.Hero.deleteMany({})
   .then(() => db.Hero.collection.insertMany(heroSeeds))
   .then(data => {
