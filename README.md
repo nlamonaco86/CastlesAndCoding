@@ -72,6 +72,5 @@ A tabletop RPG is less a of a game and more of a framework and set of tools - th
 
 - Robust documentation for all aspects of how to play the game.
 
-![screenshot](./screenshot.png)
-![screenshot2](./screenshot5.png)
-![screenshot2](./screenshot3.png)
+![raiding a dungeon](./screenshot6.png)
+![viewing a hero](./screenshot5.png)
