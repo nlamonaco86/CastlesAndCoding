@@ -71,10 +71,52 @@ const mainMenu = () => {
                                     }
                                 ]).then(result => {
                                     db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(hero => {
+                                        selectedHero = hero
                                         let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
                                         console.table(result);
                                         console.log(`Inventory: ${hero.inventory.join(", ")}`)
-                                        mainMenu();
+                                        inquirer.prompt([
+                                            {
+                                                type: "list",
+                                                message: "What would you like to do?",
+                                                choices: ["Switch Weapons", "Main Menu"],
+                                                name: "choice",
+                                            }
+                                        ]).then(result => {
+                                            switch (result.choice) {
+                                                case "Switch Weapons":
+                                                    // search through a character's inventory, find all items that are objects, and return them as a stringified array
+                                                    // this is to search the inventory for new weapons they gained in battle, to equip them onto the character
+                                                    // via a db update call, and put the equipped item into the inventory
+                                                    db.Hero.findOne({ _id: selectedHero._id }).then(result => {
+                                                        let possibleItems = [];
+                                                        for (let i = 0; i < result.inventory.length; i++) {
+                                                            if (typeof result.inventory[i] === 'object' && result.inventory[i] !== null) {
+                                                                // JSON.stringify the object to display it as a choice with inquirer and retain all properties
+                                                                possibleItems.push(JSON.stringify(result.inventory[i]));
+                                                            };
+                                                        };
+                                                        inquirer.prompt([
+                                                            {
+                                                                type: "list",
+                                                                message: "Choose an item to equip",
+                                                                choices: possibleItems,
+                                                                name: "toEquip",
+                                                            }
+                                                        ]).then(item => {
+                                                            db.Hero.findOneAndUpdate({ _id: selectedHero._id }, { $push: { inventory: selectedHero.weapon }, weapon: JSON.parse(item.toEquip) }, { new: true }).then(hero => {
+                                                                let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
+                                                                console.table(result);
+                                                                mainMenu();
+                                                            });
+                                                        })
+
+                                                    });
+                                                    break;
+                                                case "Main Menu":
+                                                    mainMenu();
+                                            }
+                                        })
                                     });
                                 });
                             });
@@ -120,6 +162,7 @@ const mainMenu = () => {
                                     db.Monster.findOne({ name: result.choice.split(" ")[0] }).then(monster => {
                                         let result = { name: monster.name, hp: monster.hp, armor: monster.armor, level: monster.level, damage: `${monster.damageLow}-${monster.damageHigh}`, gold: monster.gold, taunt: monster.taunt }
                                         console.table(result);
+                                        mainMenu();
                                     });
                                 });
                             });
@@ -131,63 +174,36 @@ const mainMenu = () => {
                     {
                         type: "list",
                         message: "Prepare to Battle!",
-                        choices: ["Hero vs. Monster", "Battle Until Defeated", "Raid a Dungeon"],
+                        choices: ["Raid a Dungeon", "Battle Until Defeated", "Hero vs. Monster"],
                         name: "selected",
                     }
                 ]).then(option => {
                     switch (option.selected) {
                         case "Hero vs. Monster":
-                            inquirer.prompt([
-                                {
-                                    type: "list",
-                                    message: "Whomst Shall You Battle?",
-                                    choices: ["Choose a Foe", "Battle a Random Monster"],
-                                    name: "selected",
-                                }
-                            ]).then(option => {
-                                switch (option.selected) {
-                                    case "Choose a Foe":
-                                        db.Hero.find({}).then(results => {
-                                            inquirer.prompt([
-                                                {
-                                                    type: "list",
-                                                    message: "Select a Hero",
-                                                    choices: results.map(x => x.name + " - Level " + x.level + " " + x.class),
-                                                    name: "choice",
-                                                }
-                                            ]).then(choice => {
-                                                selectedHero = choice
-                                                db.Monster.find({}).then(results => {
-                                                    inquirer.prompt([
-                                                        {
-                                                            type: "list",
-                                                            message: "Select a Monster",
-                                                            choices: results.map(x => `${x.name} - Level ${x.level}`),
-                                                            name: "choice",
-                                                        }
-                                                    ]).then(monster => {
-                                                        fn.chooseTwo({ name: selectedHero.choice.split(" ") }, { name: monster.choice.split(" ") });
-                                                    });
-                                                });
-                                            });
+                            db.Hero.find({}).then(results => {
+                                inquirer.prompt([
+                                    {
+                                        type: "list",
+                                        message: "Select a Hero",
+                                        choices: results.map(x => x.name + " - Level " + x.level + " " + x.class),
+                                        name: "choice",
+                                    }
+                                ]).then(choice => {
+                                    selectedHero = choice
+                                    db.Monster.find({}).then(results => {
+                                        inquirer.prompt([
+                                            {
+                                                type: "list",
+                                                message: "Select a Monster",
+                                                choices: results.map(x => `${x.name} - Level ${x.level}`),
+                                                name: "choice",
+                                            }
+                                        ]).then(monster => {
+                                            fn.chooseTwo({ name: selectedHero.choice.split(" ") }, { name: monster.choice.split(" ") });
+                                            mainMenu();
                                         });
-                                        break;
-                                    default:
-                                        db.Hero.find({}).then(results => {
-                                            inquirer.prompt([
-                                                {
-                                                    type: "list",
-                                                    message: "Select a Hero",
-                                                    choices: results.map(x => `${x.name} - Level ${x.level} ${x.class}`),
-                                                    name: "choice",
-                                                }
-                                            ]).then(result => {
-                                                db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(result => {
-                                                    fn.chooseTwo({ _id: result._id }, null)
-                                                });
-                                            });
-                                        });
-                                };
+                                    });
+                                });
                             });
                             break;
                         case "Battle Until Defeated":
@@ -202,6 +218,7 @@ const mainMenu = () => {
                                 ]).then(result => {
                                     db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(result => {
                                         fn.untilYouLose({ _id: result._id })
+                                        mainMenu();
                                     });
                                 });
                             });
@@ -266,23 +283,29 @@ const mainMenu = () => {
                                                     };
                                                     // provide incentives for making a diverse group of heroes. A warrior in the party will add extra armor, a thief extra weapon damage, 
                                                     // a cleric, extra hp, and a wizard extra spell damage 
+                                                    let bonusString = [];
                                                     if (partyOfHeroes.class.includes("Warrior")) {
                                                         partyOfHeroes.armor *= 1.1; partyOfHeroes.blockChance *= 1.1;
-                                                        console.log(`${partyOfHeroes.name} gains 10% armor and block chance!`)
+                                                        bonusString.push(`10% armor and block chance`);
                                                     }
                                                     if (partyOfHeroes.class.includes("Wizard")) {
                                                         partyOfHeroes.spells[0].damageLow *= 1.1; partyOfHeroes.spells[0].damageHigh *= 1.1;
-                                                        console.log(`${partyOfHeroes.name} gains 10% spell damage!`)
+                                                        bonusString.push(`10% spell damage`);
                                                     }
                                                     if (partyOfHeroes.class.includes("Thief")) {
                                                         partyOfHeroes.weapon.damageLow *= 1.1; partyOfHeroes.weapon.damageHigh *= 1.1;
-                                                        console.log(`${partyOfHeroes.name} gains 10% weapon damage!`)
+                                                        bonusString.push(`10% weapon damage`);
                                                     }
-                                                    if (partyOfHeroes.class.includes("Cleric")) { 
-                                                        partyOfHeroes.hp *= 1.1; 
-                                                        console.log(`${partyOfHeroes.name} gains 10% hp!`) 
+                                                    if (partyOfHeroes.class.includes("Cleric")) {
+                                                        partyOfHeroes.hp *= 1.1;
+                                                        bonusString.push(`10% hp`);
                                                     }
+                                                    // Generate a string depicting the party's bonus
+                                                    // insert an "and" aftert he second to last item in the array, however long it is.
+                                                    bonusString.splice(bonusString.length - 1, 0, `and`);
+                                                    console.log(`${partyOfHeroes.name} gains ` + bonusString.join(", ") + `!`);
                                                     fn.chronicle(fn.epicShowdown(partyOfHeroes, selectedDungeon.boss));
+                                                    mainMenu();
                                                 });
                                             });
                                         });

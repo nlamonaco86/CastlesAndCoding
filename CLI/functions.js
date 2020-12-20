@@ -21,8 +21,6 @@ const findOne = (model, where) => {
     model.findOne(where).then(result => { console.log(result); });
 };
 
-// findOne(db.Hero, { name: "Merlin"}).then(result=>{console.log(result)})
-
 const updateModel = (model, where, query) => {
     model.findOneAndUpdate(where, query, { new: true }).then(result => { console.log(result); });
 };
@@ -125,7 +123,7 @@ let takeChance = (dmg, dealer, target) => {
     // If the attack is not blocked, roll to see if it's a normal or critical hit
     else {
         //  If return is !10, normal damage. if 10, double damage. 
-        if (critPick >= critArray.length - dealer.critChance && (dmg * 2) > 0) { return { dmg: dmg * 2, msg: `${dealer.name} has landed a critical hit! ${dmg * 2} damage!` } }
+        if (critPick >= critArray.length - dealer.critChance && (dmg * 2) > 0) { return { dmg: Math.round(dmg * 2), msg: `${dealer.name} has landed a critical hit! ${Math.round(dmg * 2)} damage!` } }
         else { return { dmg: dmg } };
     }
 }
@@ -250,7 +248,7 @@ const combatLog = (where) => {
                 console.log(`${result.hero} HP: ${result.combatLog[i].heroHP} || ${result.monster} HP: ${result.combatLog[i].monsterHP}`)
                 // if there is a previous set of hit points in the log, compare the two to extrapolate damage dealt this turn 
                 if (result.combatLog[i - 1]) {
-                    console.log(`${result.hero} deals ${result.combatLog[i - 1].monsterHP - result.combatLog[i].monsterHP} damage! || ${result.monster} deals ${result.combatLog[i - 1].heroHP - result.combatLog[i].heroHP} damage!`)
+                    console.log(`${result.hero} deals ${result.combatLog[i - 1].monsterHP - result.combatLog[i].monsterHP} damage! || ${result.monster} deals ${result.combatLog[i - 1].heroHP - result.combatLog[i].heroHP} damage!`);
                 }
             }
         }
@@ -269,36 +267,36 @@ const lootMonster = (hero, monster, loot) => {
 transferItem = async function (receiverId, receiverType, giverId, giverType, transactionType, amount) {
     if (transactionType === "gold") {
         // query the database twice to find both objects
-        let receiver = await receiverType.findOne({ _id: receiverId })
-        let giver = await giverType.findOne({ _id: giverId })
+        let receiver = await receiverType.findOne({ _id: receiverId });
+        let giver = await giverType.findOne({ _id: giverId });
         // // sometimes, take ALL the gold, like defeating a monster
         if (amount === "all") {
             // subtract the amount from the giver
-            giverType.findOneAndUpdate({ _id: giverId }, { gold: 0 }, { new: true }).then(result => { })
+            giverType.findOneAndUpdate({ _id: giverId }, { gold: 0 }, { new: true }).then(result => { });
             // receiver gains amount of gold equal to what the giver had
-            receiverType.findOneAndUpdate({ _id: receiverId }, { gold: receiver.gold + giver.gold }, { new: true }).then(result => { })
+            receiverType.findOneAndUpdate({ _id: receiverId }, { gold: receiver.gold + giver.gold }, { new: true }).then(result => { });
         }
         else {
             // but sometimes, only take SOME, like buying an item from another player or NPC
-            amount = amount
+            amount = amount;
             // subtract the amount from the giver
-            giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { console.log(giver.name + " now has " + result.gold + " gold."); })
+            giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { console.log(giver.name + " now has " + result.gold + " gold."); });
             // receiver gains amount of gold equal to what the giver had
-            receiverType.findOneAndUpdate({ _id: receiverId }, { gold: receiver.gold + amount }, { new: true }).then(result => { console.log(receiver.name + " now has " + result.gold + " gold."); })
+            receiverType.findOneAndUpdate({ _id: receiverId }, { gold: receiver.gold + amount }, { new: true }).then(result => { console.log(receiver.name + " now has " + result.gold + " gold."); });
         };
     };
     // What if a character dies in battle, and we want them to lose some gold as a penalty
     if (transactionType === "penalty") {
         // query the database to find the defeated hero
-        let giver = await giverType.findOne({ _id: giverId })
-        amount = amount
+        let giver = await giverType.findOne({ _id: giverId });
+        amount = amount;
         // subtract the amount from the giver
-        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { console.log(giver.name + " dropped " + amount + " gold."); })
+        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { console.log(giver.name + " dropped " + amount + " gold."); });
     };
     if (transactionType === "loot") {
         // search for the receiver's inventory
         giverType.findOne({ _id: giverId }).then(result => {
-            result.inventory[Math.floor(Math.random() * result.inventory.length)]
+            result.inventory[Math.floor(Math.random() * result.inventory.length)];
             // pick a random item from it, push it to the receiver's loot (they "picked up" the item)
             receiverType.findOneAndUpdate({ _id: receiverId }, { $push: { inventory: result.inventory } }, { new: true }).then(result => {
             });
@@ -306,6 +304,33 @@ transferItem = async function (receiverId, receiverType, giverId, giverType, tra
     };
 };
 
+// search through a character's inventory, find all items that are objects, and return them as an array
+// this is to search the inventory for new weapons/spells they gained in battle, to equip them onto the character
+// via a db update call, and put the equipped item into the inventory, or to delete an unwanted item 
+// "slot" refers to it being called for spells or weapon
+const searchInventory = (model, modelWhere, type) => {
+    model.findOne(modelWhere).then(result => {
+        let possibleItems = [];
+        let array;
+        if (type === "item") { array = result.inventory; }
+        if (type === "spell") { array = result.spells; }
+        for (let i = 0; i < array.length; i++) {
+            if (typeof array[i] === 'object' && array[i] !== null) {
+                possibleItems.push(array[i]);
+            };
+        };
+        console.log(result);
+    });
+};
 
+// Switch an item between the weapon slot and the inventory
+const swapItem = (model, modelWhere, swapIn) => {
+    model.findOne(modelWhere).then(result => {
+        let incoming = swapIn;
+        model.findOneAndUpdate(modelWhere, { $push: { inventory: result.weapon }, weapon: incoming }, { new: true }).then(result => {
+            console.log(result);
+        });
+    });
+};
 
-module.exports = { createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem }
+module.exports = { createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, searchInventory, swapItem }
