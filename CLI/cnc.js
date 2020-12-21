@@ -172,8 +172,10 @@ const mainMenu = () => {
                                     });
                                 });
                             });
+                            break;
                         case "Go Back":
                             mainMenu();
+                            break;
                     };
                 });
                 break;
@@ -321,8 +323,10 @@ const mainMenu = () => {
                                     });
                                 });
                             });
+                            break;
                         case "Go Back":
                             mainMenu();
+                            break;
                     };
                 });
                 break;
