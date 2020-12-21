@@ -21,7 +21,7 @@ const mainMenu = () => {
         {
             type: "list",
             message: "Main Menu",
-            choices: ["Create", "View", "Battle", "Edit", "Escape"],
+            choices: ["Create", "View", "Battle", "Escape"],
             name: "option",
         }
     ]).then(menu => {
@@ -31,7 +31,7 @@ const mainMenu = () => {
                     {
                         type: "list",
                         message: "What would you like to create?",
-                        choices: ["Hero", "Monster", "Dungeon", "Party"],
+                        choices: ["Hero", "Monster", "Dungeon", "Party", "Go Back"],
                         name: "choice",
                     }
                 ]).then(select => {
@@ -47,6 +47,8 @@ const mainMenu = () => {
                             break;
                         case "Party":
                             cli.createParty();
+                        case "Go Back":
+                            mainMenu();
 
                     };
                 });
@@ -56,7 +58,7 @@ const mainMenu = () => {
                     {
                         type: "list",
                         message: "What would you like to View?",
-                        choices: ["Heroes", "Monsters", "Parties"],
+                        choices: ["Heroes", "Monsters", "Parties", "Go Back"],
                         name: "choice",
                     }
                 ]).then(select => {
@@ -74,9 +76,9 @@ const mainMenu = () => {
                                     db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(hero => {
                                         selectedHero = hero
                                         let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
-                                        if (hero.class === "Wizard" ) { console.log(ascii.wizard) }
-                                        if (hero.class === "Warrior" ) { console.log(ascii.warrior) }
-                                        if (hero.class === "Cleric" ) { console.log(ascii.cleric) }
+                                        if (hero.class === "Wizard") { console.log(ascii.wizard) }
+                                        if (hero.class === "Warrior") { console.log(ascii.warrior) }
+                                        if (hero.class === "Cleric") { console.log(ascii.cleric) }
                                         console.table(result);
                                         console.log(`Inventory: ${hero.inventory.join(", ")}`)
                                         inquirer.prompt([
@@ -170,6 +172,8 @@ const mainMenu = () => {
                                     });
                                 });
                             });
+                        case "Go Back":
+                            mainMenu();
                     };
                 });
                 break;
@@ -178,7 +182,7 @@ const mainMenu = () => {
                     {
                         type: "list",
                         message: "Prepare to Battle!",
-                        choices: ["Raid a Dungeon", "Battle Until Defeated", "Hero vs. Monster"],
+                        choices: ["Raid a Dungeon", "Battle Until Defeated", "Hero vs. Monster", "Go Back"],
                         name: "selected",
                     }
                 ]).then(option => {
@@ -317,14 +321,15 @@ const mainMenu = () => {
                                     });
                                 });
                             });
-                            ;
+                        case "Go Back":
+                            mainMenu();
                     };
                 });
                 break;
-            case "Edit":
-                console.log("This feature is under construction!");
-                mainMenu();
-                break;
+            // case "Edit":
+            //     console.log("This feature is under construction!");
+            //     mainMenu();
+            //     break;
             case "Escape":
                 console.log("Farewell!");
                 process.exit(1);

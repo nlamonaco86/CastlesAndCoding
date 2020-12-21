@@ -188,7 +188,7 @@ const epicShowdown = (hero, monster) => {
             db.Battle.create(monsterWins).then(result => { });
             // Lose 30 gold on death to a monster
             transferItem(monster._id, db.Monster, hero._id, db.Hero, "penalty", 30);
-            return monsterWins
+            return monsterWins;
         }
     };
 };
@@ -216,7 +216,7 @@ const untilYouLose = async function (where) {
         let status = epicShowdown(hero, monster);
         // On win, log the results and continue to another battle
         // generate a different monster for the next battle
-        if (status.victory === true) { chronicle(status); monster = createRandomMonster(hero); score = score + 1 }
+        if (status.victory === true) { chronicle(status); monster = createRandomMonster(hero); score = score + 1;  }
         // On loss, log the results and stop
         else { return chronicle(status, score); };
     };
@@ -258,7 +258,7 @@ const combatLog = (where) => {
 // Hero character gains all of the monster's gold and xp, plus a random item from its inventory
 // The monster is left unmodified so that it can be re-used
 const lootMonster = (hero, monster, loot) => {
-    db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold }, $inc: { xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(result => {
+    db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold, xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(result => {
     });
 };
 
@@ -291,7 +291,13 @@ transferItem = async function (receiverId, receiverType, giverId, giverType, tra
         let giver = await giverType.findOne({ _id: giverId });
         amount = amount;
         // subtract the amount from the giver
-        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { console.log(giver.name + " dropped " + amount + " gold."); });
+        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { 
+            console.log(giver.name + " dropped " + amount + " gold."); 
+        // prevent characters from having negative gold, if they would reach a negative amount, set it to zero instead.
+            if (result.gold < 0) {
+                giverType.findOneAndUpdate({ _id: giverId }, { gold: 0 }, { new: true }).then(result => {})
+            }
+        });
     };
     if (transactionType === "loot") {
         // search for the receiver's inventory
