@@ -216,7 +216,7 @@ const untilYouLose = async function (where) {
         let status = epicShowdown(hero, monster);
         // On win, log the results and continue to another battle
         // generate a different monster for the next battle
-        if (status.victory === true) { chronicle(status); monster = createRandomMonster(hero); score = score + 1;  }
+        if (status.victory === true) { chronicle(status); monster = createRandomMonster(hero); score = score + 1; }
         // On loss, log the results and stop
         else { return chronicle(status, score); };
     };
@@ -258,7 +258,26 @@ const combatLog = (where) => {
 // Hero character gains all of the monster's gold and xp, plus a random item from its inventory
 // The monster is left unmodified so that it can be re-used
 const lootMonster = (hero, monster, loot) => {
-    db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold, xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(result => {
+    db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold, xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(hero => {
+        // After a victory over a monster, check to see if the character has reached a certain Xp threshold
+        // An exponential increment is desired - going from level 1-2 should be much shorter than lvl 17-18, etc.
+        // Update the character's level and provide a 10%? bonus to all stats as a reward
+        // for thief/warrior boost their weapon damage, for cleric/wizard boost their spells
+        if ( hero.xp >= hero.level * 75 ) {
+            if ( hero.class == "Warrior" || hero.class == "Thief") {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: hero.hp * 1.1, armor: hero.armor * 1.1, critChance: hero.critChance * 1.1,
+                    blockChance: hero.blockChance * 1.1, weapon: { name: hero.weapon.name, damageLow: hero.weapon.damageLow * 1.2,
+                        damageHigh: hero.weapon.damageHigh * 1.1 } }, { new: true }).then(hero => {
+                            console.log(`${hero.name} has reached level ${hero.level}!`)
+            });
+        }
+        else {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: hero.hp * 1.1, armor: hero.armor * 1.1, critChance: hero.critChance * 1.1,
+                blockChance: hero.blockChance * 1.1, spells: [{name: hero.spells[0].name, damageLow: hero.spells[0].damageLow * 1.2, damageHigh: hero.spells[0].damageHigh * 1.2}] }, { new: true }).then(hero => {
+                        console.log(`${hero.name} has reached level ${hero.level}!`)
+                    });
+        }
+        };
     });
 };
 
@@ -291,11 +310,11 @@ transferItem = async function (receiverId, receiverType, giverId, giverType, tra
         let giver = await giverType.findOne({ _id: giverId });
         amount = amount;
         // subtract the amount from the giver
-        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => { 
-            console.log(giver.name + " dropped " + amount + " gold."); 
-        // prevent characters from having negative gold, if they would reach a negative amount, set it to zero instead.
+        giverType.findOneAndUpdate({ _id: giverId }, { gold: giver.gold - amount }, { new: true }).then(result => {
+            console.log(`${giver.name} dropped ${amount} gold.`);
+            // prevent characters from having negative gold, if they would reach a negative amount, set it to zero instead.
             if (result.gold < 0) {
-                giverType.findOneAndUpdate({ _id: giverId }, { gold: 0 }, { new: true }).then(result => {})
+                giverType.findOneAndUpdate({ _id: giverId }, { gold: 0 }, { new: true }).then(result => { })
             }
         });
     };
