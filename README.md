@@ -17,25 +17,25 @@ Players can create personalized hero and monster characters complete with their 
 
 Monsters can also be randomly generated and will scale with the hero's stats - the stronger the hero, the more fearsome the monsters will be.
 
-Players can also create Non-Player Characters with their own items, inventory, and things to say. 
-
 ## Combat and Loot System
 
 Players can battle a specific hero against a specific monster one time, or battle against randomly-generated monsters over and over again until the hero is defeated.
 
 Records of each battle are displayed in the console, and kept in the database for later viewing.
 
-The "combat" system includes random chances for both heroes and monsters to block attacks or land critical hits. Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. Heroes can equip new items they gain from battles.
+The combat system includes random chances for both heroes and monsters to block attacks or land critical hits. 
+
+Monsters will drop gold, xp and items upon defeat, which will then transfer to the hero's inventory. Heroes level-up from experience, gain stats, and can equip new items they gain from battles.
 
 ## Design and Raid Your Own Dungeons
 
-Players can create their own dungeons, with unique descriptions, dungeon bosses, treasures, and minions.
+Players can create their own dungeons, with unique descriptions, dungeon bosses, treasures, and minions within.
 
 Heroes can form a party in order to confront the powerful boss of a dungeon as a group. The party gains various bonuses based upon its makeup, then raids the dungeon as a group.  
 
-## Optional - No DB required
+## Town & Marketplace
 
-A simplified version of the game, requiring no database, is also provided.
+Visit the town, where heroes can enter a shop to buy and sell items to non-player characters.
 
 ## Instructions
 
@@ -72,5 +72,6 @@ A tabletop RPG is less a of a game and more of a framework and set of tools - th
 
 - Robust documentation for all aspects of how to play the game.
 
-![raiding a dungeon](./screenshot7.png)
-![viewing a hero](./screenshot5.png)
+![raiding a dungeon](./screenshots/screenshot7.png)
+![viewing a hero](./screenshots/screenshot5.png)
+![visiting a shop](./screenshots/screenshot8.png)

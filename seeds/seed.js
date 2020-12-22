@@ -288,7 +288,7 @@ let dungeonSeeds = [
         taunt: 'The creature is backed into a corner, and has no choice but to fight you.',
       }
     }
-  ]
+  ];
   
 let partySeeds = [
     {
@@ -300,8 +300,19 @@ let partySeeds = [
       ],
       name: 'The Merry Band',
     }
-  ]
+  ];
 
+let npcSeeds= [
+  {
+    name: "Blacksmith",
+    sprite: "placeholder URL",
+    inventory: [{ name: "Longsword", damageLow: 6, damageHigh: 10, cost: 80}, { name: "Broadsword", damageLow: 8, damageHigh: 14, cost: 120}, { name: "Jeweled Dagger", damageLow: 6, damageHigh: 18, cost: 320 }, { name: "Battle Hammer", damageLow: 2, damageHigh: 24, cost: 220 }],
+    gold: 740,
+    statements: ["I've got the best equipment you've ever seen!", "Handcrafted, forged with the finest quality...", "We've been doing this for three generations. I know a thing or two about quality!"]
+  }
+]
+
+db.Npc.insertMany(npcSeeds).then(result=>{console.log(`Npc's inserted`)})
   db.Battle.deleteMany({}).then(resukt=>{console.log("All battles deleted.")})
   db.Hero.deleteMany({})
   .then(() => db.Hero.collection.insertMany(heroSeeds))
