@@ -5,23 +5,27 @@ const { v4: uuidv4 } = require('uuid');
 const cli = require("./cli-functions");
 const fn = require("./functions");
 const ascii = require("./ascii");
+const ConfirmPrompt = require('inquirer/lib/prompts/confirm');
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
-// Empty variables to hold temp data between CLI menus
+// Empty variables to hold temp data between CLI menus and reduce database calls needed
 let selectedHero;
 let selectedHeroes = [];
 let selectedParty;
 let selectedDungeon;
-let partyName
+let partyName;
+let selectedNpc;
+let browsedItem;
+let itemToScrap;
 
+console.log(ascii.main);
 const mainMenu = () => {
-    console.log(ascii.main)
     inquirer.prompt([
         {
             type: "list",
             message: "Main Menu",
-            choices: ["Create", "View", "Battle", "Escape"],
+            choices: ["Create", "View", "Battle", "Visit Town", "Escape"],
             name: "option",
         }
     ]).then(menu => {
@@ -79,6 +83,7 @@ const mainMenu = () => {
                                         if (hero.class === "Wizard") { console.log(ascii.wizard) }
                                         if (hero.class === "Warrior") { console.log(ascii.warrior) }
                                         if (hero.class === "Cleric") { console.log(ascii.cleric) }
+                                        if (hero.class === "Thief") { console.log(ascii.thief) }
                                         console.table(result);
                                         console.log(`Inventory: ${hero.inventory.join(", ")}`)
                                         inquirer.prompt([
@@ -263,6 +268,7 @@ const mainMenu = () => {
                                             ]).then(result => {
                                                 db.Dungeon.findOne({ name: result.choice }).then(result => {
                                                     selectedDungeon = result
+                                                    console.log(selectedDungeon.description);
                                                     // extract the boss object & combine all heroes in the party into one character
                                                     // apply various if conditions for bonuses as a party, then battle the party vs. the boss monster
                                                     // combine map and reduce, to return an array of all the items in each object's particular key and then combine them here
@@ -330,10 +336,174 @@ const mainMenu = () => {
                     };
                 });
                 break;
-            // case "Edit":
-            //     console.log("This feature is under construction!");
-            //     mainMenu();
-            //     break;
+            case "Visit Town":
+                console.log(ascii.town);
+                inquirer.prompt([{
+                    type: "list",
+                    message: "Where would you like to go?",
+                    choices: ["Blacksmith", "Tavern", "Main Menu"],
+                    name: "location",
+                }]).then(choice => {
+                    switch (choice.location) {
+                        case "Blacksmith":
+                            db.Hero.find({}).then(results => {
+                                inquirer.prompt([
+                                    {
+                                        type: "list",
+                                        message: "Select a Hero",
+                                        choices: results.map(x => x.name + " - Level " + x.level + " " + x.class),
+                                        name: "choice",
+                                    }
+                                ]).then(result => {
+                                    db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(result => {
+                                        selectedHero = result;
+                                        console.log(`The Blacksmith says "Welcome to my shop, ${result.name}`);
+                                        inquirer.prompt([
+                                            {
+                                                type: "list",
+                                                message: "What would you like to do?",
+                                                choices: ["Buy", "Sell", "Go Back"],
+                                                name: "choice",
+                                            }
+                                        ]).then(result => {
+                                            db.Npc.findOne({ name: "Blacksmith" }).then(npc => {
+                                                selectedNpc = npc;
+                                                switch (result.choice) {
+                                                    case "Buy":
+                                                        // map out the NPC's inventory and display it as 
+                                                        let forSale = npc.inventory.map(i => JSON.stringify(i));
+                                                        console.log(`The ${npc.name} says "${npc.statements[Math.floor(Math.random() * npc.statements.length)]}"`);
+                                                        inquirer.prompt([
+                                                            {
+                                                                type: "list",
+                                                                message: "You are browsing the Blacksmith's inventory. Press ENTER to purchase",
+                                                                choices: forSale,
+                                                                name: "choice",
+                                                            }
+                                                        ]).then(item => {
+                                                            browsedItem = JSON.parse(item.choice);
+                                                            inquirer.prompt([
+                                                                {
+                                                                    type: "confirm",
+                                                                    message: `Purchase ${browsedItem.name} for ${browsedItem.cost} gold?`,
+                                                                    name: "confirm",
+                                                                }
+                                                            ]).then(choice => {
+                                                                if (choice.confirm === true && browsedItem.cost < selectedHero.gold) {
+                                                                    db.Hero.findOneAndUpdate({ _id: selectedHero._id }, { $push: { inventory: browsedItem }, gold: selectedHero.gold - browsedItem.cost }, { new: true }).then(hero => {
+                                                                        console.log(`${hero.name} purchased ${browsedItem.name}! View Hero to equip the item.`)
+                                                                        mainMenu();
+                                                                    });
+                                                                }
+                                                                else {
+                                                                    console.log("You don't have enough gold to purchase that item!");
+                                                                    mainMenu();
+                                                                }
+                                                            });
+                                                        });
+
+                                                        break;
+                                                    case "Sell":
+                                                        console.log(`The Blacksmith says "It might not be worth much, but I can always use the scrap...`);
+                                                        let scrapItems = [];
+                                                        // search the character's inventory array for all items that are objects, display them as a multiple choice list
+                                                        for (let i = 0; i < selectedHero.inventory.length; i++) {
+                                                            if (typeof selectedHero.inventory[i] === 'object' && selectedHero.inventory[i] !== null) {
+                                                                // JSON.stringify the object to display it as a choice with inquirer and retain all properties
+                                                                scrapItems.push(JSON.stringify(selectedHero.inventory[i]));
+                                                            };
+                                                        };
+                                                        // if they have items that can be scrapped, proceed, else return to main menu
+                                                        if (scrapItems.length > 0) {
+                                                            inquirer.prompt([
+                                                                {
+                                                                    type: "list",
+                                                                    message: "Select an item to sell.",
+                                                                    choices: scrapItems,
+                                                                    name: "scrap",
+                                                                }
+                                                            ]).then(item => {
+                                                                itemToScrap = JSON.parse(item.scrap);
+                                                                // prompt a confirm, if yes, set inventory to all items that were not selected, adjust gold + valur of items that were selected 
+                                                                inquirer.prompt([
+                                                                    {
+                                                                        type: "confirm",
+                                                                        message: `Scrap ${itemToScrap.name} for 4 gold?`,
+                                                                        name: "confirm",
+                                                                    }
+                                                                ]).then(choice => {
+                                                                    if ( choice.confirm === true ) {
+                                                                        // Unfortunately, this will sell duplicate items at the same time. id constrain on the "item" object would fix this, but
+                                                                        // displaying IDs in the console is sort of ugly, so it's left this way for now.  
+                                                                        db.Hero.findOneAndUpdate({ _id: selectedHero._id }, { $pull: { inventory: itemToScrap }, $inc: { gold: 4 } }, { new: true, multi: false }).then(hero => {
+                                                                            console.log(`${hero.name} scrapped ${itemToScrap.name}!`)
+                                                                            mainMenu();
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log("You reject the Blacksmith's offer for the item.");
+                                                                        mainMenu();
+                                                                    }
+                                                                })
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log(`${selectedHero.name} doesn't have any items to scrap!`);
+                                                            mainMenu();
+                                                        }
+                                                        break;
+                                                    case "Go Back":
+                                                        mainMenu();
+                                                }
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+
+                            break;
+                        case "Tavern":
+                            db.Hero.find({}).then(results => {
+                                inquirer.prompt([
+                                    {
+                                        type: "list",
+                                        message: "Select a Hero",
+                                        choices: results.map(x => x.name + " - Level " + x.level + " " + x.class),
+                                        name: "choice",
+                                    }
+                                ]).then(result => {
+                                    selectedHero = result;
+                                    console.log(`The Innkeeper says "Welcome to my shop, ${selectedHero.name}"`);
+                                    inquirer.prompt([
+                                        {
+                                            type: "list",
+                                            message: "What would you like to do?",
+                                            choices: ["Buy", "Sell", "Go Back"],
+                                            name: "choice",
+                                        }
+                                    ]).then(result => {
+                                        switch (result.choice) {
+                                            case "Buy":
+                                                console.log(`The Innkeeper says "I'm sorry, but we're currently closed for renovations!"`);
+                                                mainMenu();
+                                                break;
+                                            case "Sell":
+                                                console.log(`The Innkeeper says "I'm sorry, but we're currently closed for renovations!"`);
+                                                mainMenu();
+                                                break;
+                                            case "Go Back":
+                                                mainMenu();
+                                        }
+                                    });
+                                });
+                            });
+                            break;
+                        case "Main Menu":
+                            mainMenu();
+                            break;
+                    }
+                })
+                break;
             case "Escape":
                 console.log("Farewell!");
                 process.exit(1);
