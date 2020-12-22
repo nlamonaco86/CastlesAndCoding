@@ -322,6 +322,9 @@ const mainMenu = () => {
                                                     bonusString.splice(bonusString.length - 1, 0, `and`);
                                                     console.log(`${partyOfHeroes.name} gains ` + bonusString.join(", ") + `!`);
                                                     fn.chronicle(fn.epicShowdown(partyOfHeroes, selectedDungeon.boss));
+                                                    // empty out the hero objects/arrays, to prevent the party simply becoming stronger and stronger on multiple attempts
+                                                    partyOfHeroes = { };
+                                                    selectedHeroes = [];
                                                     mainMenu();
                                                 });
                                             });
