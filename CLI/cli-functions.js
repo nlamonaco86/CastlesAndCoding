@@ -4,11 +4,18 @@ const { v4: uuidv4 } = require('uuid');
 let inquirer = require('inquirer');
 let questions = require("./questions");
 let ascii = require("./ascii");
+const menu = require("./cnc")
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
+let selectedHero;
+let selectedHeroes = [];
+let selectedParty;
 let selectedDungeon;
-let selectedHeroes;
+let partyName;
+let selectedNpc;
+let browsedItem;
+let itemToScrap;
 
 const addHeroToDb = (name, hp, armor, occupation, weapon, critChance, blockChance, spells, lastWords) => {
     db.Hero.create({ name: name, sprite: "URL", hp: hp, armor: armor, xp: 0, level: 1, class: occupation, weapon: weapon, critChance: critChance, blockChance: blockChance, spells: spells, inventory: [], gold: 10, lastWords: lastWords }).then((hero) => {
@@ -20,8 +27,8 @@ const addHeroToDb = (name, hp, armor, occupation, weapon, critChance, blockChanc
     });
 };
 
-let cli = {
-    createMonster: () => {
+let cli = new function() {
+    this.createMonster = () => {
         inquirer.prompt(questions.createMonster).then(answers => {
             // db.Monster.create(answers) could normally be used here, but _id is overriden for other purposes so I can't
             db.Monster.create({
@@ -56,7 +63,7 @@ let cli = {
         }).catch(error => { console.log(error) })
     },
 
-    createHero: () => {
+    this.createHero =  () => {
         inquirer.prompt(questions.createHero).then(answers => {
             // Base stats for all heroes
             let hp = 20
@@ -94,14 +101,14 @@ let cli = {
                 }
             ]).then(answers => {
                 if (answers.another === "Yes") {
-                    createHero();
+                    this.createHero();
                 }
                 else { process.exit(1); }
             })
         }).catch(error => { console.log(error) })
     },
 
-    createDungeon: () => {
+    this.createDungeon = () => {
         inquirer.prompt(questions.createDungeon).then(answers => {
             db.Dungeon.create(answers).then(result => {
                 selectedDungeon = result
@@ -145,7 +152,7 @@ let cli = {
         });
     },
 
-    createParty: () => {
+    this.createParty = () => {
         db.Hero.find({}).then(heroes => {
             inquirer.prompt([
                 {
@@ -165,7 +172,7 @@ let cli = {
                         });
                 });
         });
-    },
+    }
 };
 
 module.exports = cli

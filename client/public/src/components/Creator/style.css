@@ -1,0 +1,9 @@
+.a{
+    color: white;
+  }
+
+.a:hover{
+    text-decoration: none;
+    color: #d9534f;
+    cursor: url('./8-bit-sword-1.cur'), auto;
+}
