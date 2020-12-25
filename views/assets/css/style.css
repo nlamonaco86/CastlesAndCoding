@@ -1,0 +1,44 @@
+body{
+    cursor: url('./8-bit-sword-1.cur'), auto;  
+}
+
+.a{
+    text-decoration: none;
+    color: #d9534f;
+}
+
+.a:hover{
+    text-decoration: none;
+    color:white;
+    cursor: url('./8-bit-sword-1.cur'), auto;
+}
+
+.vt-lg {
+    font-family: 'VT323', monospace;
+    font-size: 48px;
+    color: white;
+  }
+  
+  .vt {
+    font-family: 'VT323', monospace;
+    font-size: 36px;
+    color: white;
+  }
+  
+  .vt-md {
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    color: white;
+  }
+  
+  
+  .vt-sm {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    color: white;
+  }
+
+  @font-face {
+    font-family: 'VT323';
+    src: local('VT323'), url(../fonts/VT323-Regular.ttf) format('truetype');
+  }
