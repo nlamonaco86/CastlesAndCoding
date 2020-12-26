@@ -1,0 +1,18 @@
+<div class="container mt-5 vt" style="border:double;color:white;border-width:15px;max-Width: 950px;">
+
+    <div class="row text-center">
+        <h1 class="vt-lg text-danger">{{options.heading}}</h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <img src="{{options.src}}" alt="{{options.alt}}"
+            style="max-width: 800px;"></img>
+    </div>
+
+    <div class="text-center">
+        {{#each menuOptions}}
+        {{> menuLink}}
+        {{/each}}
+    </div>
+
+</div>

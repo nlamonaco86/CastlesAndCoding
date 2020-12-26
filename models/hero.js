@@ -12,7 +12,7 @@ let hero = new Schema({
   blockChance: Number,
   critChance: Number, 
   weapon: {},
-  spells: [],
+  spells: {},
   inventory: [],
   gold: Number,
   lastWords: String,

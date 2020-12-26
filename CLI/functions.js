@@ -358,4 +358,60 @@ const swapItem = (model, modelWhere, swapIn) => {
     });
 };
 
-module.exports = { createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, searchInventory, swapItem }
+const combineModels = (selectedHeroes, partyName) => {
+    let partyOfHeroes = {
+        _id: selectedHeroes.map(h => h._id),
+        name: partyName,
+        hp: selectedHeroes.map(h => h.hp).reduce((a, b) => { return a + b; }, 0),
+        xp: selectedHeroes.map(h => h.xp).reduce((a, b) => { return a + b; }, 0),
+        armor: selectedHeroes.map(h => h.armor).reduce((a, b) => { return a + b; }, 0),
+        class: selectedHeroes.map(h => h.class),
+        // for crit/block, use the average of all the characters' chances
+        critChance: Math.floor(selectedHeroes.map(h => h.critChance).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
+        blockChance: Math.floor(selectedHeroes.map(h => h.blockChance).reduce((a, b) => { return a + b; }, 0) / selectedHeroes.length),
+        // create a weapon that's the combination of all heroe' weapons
+        weapon: {
+            name: "The Party's Blade",
+            damageLow: selectedHeroes.map(h => h.weapon.damageLow).reduce((a, b) => { return a + b; }, 0),
+            damageHigh: selectedHeroes.map(h => h.weapon.damageHigh).reduce((a, b) => { return a + b; }, 0)
+        },
+        // for spells, create a spell much like the weapon
+        spells: {
+            name: "The Might of Magic",
+            damageLow: selectedHeroes.map(h => h.spells.damageLow).reduce((a, b) => { return a + b; }, 0),
+            damageHigh: selectedHeroes.map(h => h.spells.damageHigh).reduce((a, b) => { return a + b; }, 0)
+        },
+        gold: selectedHeroes.map(h => h.gold).reduce((a, b) => { return a + b; }, 0),
+        inventory: [],
+        bonusString: [],
+        lastWords: ""
+    };
+    // provide incentives for making a diverse group of heroes. A warrior in the party will add extra armor, a thief extra weapon damage, 
+    // a cleric, extra hp, and a wizard extra spell damage 
+    if (partyOfHeroes.class.includes("Warrior")) {
+        console.log(partyOfHeroes.armor)
+        partyOfHeroes.armor *= Math.floor(1.1); 
+        partyOfHeroes.blockChance *= Math.floor(1.1);
+        partyOfHeroes.bonusString.push(`10% armor and block chance`);
+    }
+    if (partyOfHeroes.class.includes("Wizard")) {
+        partyOfHeroes.spells.damageLow *= Math.floor(1.1); 
+        partyOfHeroes.spells.damageHigh *= Math.floor(1.1);
+        partyOfHeroes.bonusString.push(`10% spell damage`);
+    }
+    if (partyOfHeroes.class.includes("Thief")) {
+        partyOfHeroes.weapon.damageLow *= Math.floor(1.1); 
+        partyOfHeroes.weapon.damageHigh *= Math.floor(1.1);
+        partyOfHeroes.bonusString.push(`10% weapon damage`);
+    }
+    if (partyOfHeroes.class.includes("Cleric")) {
+        partyOfHeroes.hp *= Math.floor(1.1);
+        partyOfHeroes.bonusString.push(`10% hp`);
+    }
+    // Generate a string depicting the party's bonus
+    // insert an "and" aftert he second to last item in the array, however long it is.
+    partyOfHeroes.bonusString.splice(partyOfHeroes.bonusString.length - 1, 0, `and`);
+    return partyOfHeroes
+}
+
+module.exports = { combineModels, createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, searchInventory, swapItem }
