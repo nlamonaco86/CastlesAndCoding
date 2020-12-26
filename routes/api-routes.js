@@ -1,9 +1,14 @@
 var db = require("../models");
 
 module.exports = function (app) {
-  app.get("/api/view/heroes/all", function (req, res) {
-    db.Hero.find({}).then(function (dbImages) {
-      res.json(dbImages);
-    });
-  });
+
+  app.post("/api/create/hero", (req, res) => {
+    db.Hero.create(req.body).then(result => {
+      res.redirect(307, "/api/login");
+    }).catch(err => {
+      console.log(err)
+      res.status(401).json(err);
+    })
+  })
+
 };

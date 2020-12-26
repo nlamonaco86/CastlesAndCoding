@@ -1,0 +1,110 @@
+<div class="container mt-5 vt" style="border:double;color:white;border-width:15px">
+
+    <div class="row justify-content-center text-danger vt-lg">Create Hero</div>
+
+    <div class="row justify-content-around container">
+
+        <div class="col-lg-6 ">
+            <img src="" class="img-fluid" alt=""></img>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vt-lg d-flex justify-content-center">
+                <p class="vt-sm text-danger" id="errorBox"></p>
+            </div>
+            <form id="createHero">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control bg-dark text-white" id="name"
+                        placeholder="Enter Your Name"></input>
+                </div>
+                <div class="form-group mt-4">
+                    <label for="class">Class</label>
+                    <select class="form-control bg-dark text-white" id="class">
+                        <option>Warrior</option>
+                        <option>Wizard</option>
+                        <option>Cleric</option>
+                        <option>Thief</option>
+                    </select>
+                </div>
+                <div class="form-group mt-4 mb-5">
+                    <label for="lastWords">Last Words?</label>
+                    <input type="text" class="form-control bg-dark text-white" id="lastWords"
+                        placeholder="It's dangerous out there..."></input>
+                </div>
+                <div className="row">
+                    <div class="d-flex justify-content-center">
+                        {{!-- onclick="document.getElementById('createHere').submit();" --}}
+                        <a class="a" href="javascript:{}" style="font-size:48px;" id="createBtn">CREATE</a>
+                        {{!-- <button class="text-white bg-danger" style="text-decoration:none">CREATE</button> --}}
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center text-danger mb-2">
+                <div class="vt-lg"><a href="../" class="a">MAIN MENU</a></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    document.getElementById("createBtn").addEventListener('click', (event) => {
+        event.preventDefault();
+        if (document.getElementById('name').value.length < 6 || document.getElementById('lastWords').value.length <= 0) {
+            document.getElementById('errorBox').innerHTML = "Please check your entry, and try again";
+        }
+    else {
+            let answers = {
+                name: document.getElementById('name').value, hp: 20,
+                armor: 0,
+                class: document.getElementById('class').value,
+                weapon: {},
+                sprite: "",
+                critChance: 5,
+                blockChance: 5,
+                spells: {},
+                gold: 0,
+                xp: 0,
+                level: 1,
+                lastWords: document.getElementById('lastWords').value,
+            };
+            // modify the stats based on the hero's class
+            // generally speaking, the warrior and cleric deal less damage but have more defenses
+            // wizard and thief deal more damage, but have less defenses
+            if (answers.class === "Warrior") {
+                answers.hp += 10; answers.armor += 3;
+                answers.weapon = { name: "short sword", damageLow: 3, damageHigh: 6 }; answers.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
+                answers.blockChance = 10; answers.sprite = "/assets/warrior.png"
+            };
+            if (answers.class === "Wizard") {
+                answers.weapon = { name: "gnarled staff", damageLow: 1, damageHigh: 3 }; answers.spells = { name: "fireball", damageLow: 8, damageHigh: 12 };
+                answers.critChance = 10;
+
+            };
+            if (answers.class === "Thief") {
+                answers.weapon = { name: "iron dagger", damageLow: 8, damageHigh: 12 }; answers.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
+                answers.critChance = 10;
+            };
+            if (answers.class === "Cleric") {
+                answers.hp += 10; answers.armor += 3;
+                answers.weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; answers.spells = { name: "word of power", damageLow: 8, damageHigh: 12 };
+                answers.blockChance = 10;
+            };
+            fetch('../api/create/hero', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify(answers),
+            })
+                .then(response => {
+                    if (response.err) {  document.getElementById('errorBox').innerHTML = "An error occured, please try again"; }
+                    window.location.replace("/");
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                });    
+    }
+})
+</script>

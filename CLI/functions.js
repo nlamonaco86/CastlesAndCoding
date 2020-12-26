@@ -362,6 +362,7 @@ const combineModels = (selectedHeroes, partyName) => {
     let partyOfHeroes = {
         _id: selectedHeroes.map(h => h._id),
         name: partyName,
+        heroes: selectedHeroes.map(h => `${" "}${h.name} - Level ${h.level} ${h.class}`),
         hp: selectedHeroes.map(h => h.hp).reduce((a, b) => { return a + b; }, 0),
         xp: selectedHeroes.map(h => h.xp).reduce((a, b) => { return a + b; }, 0),
         armor: selectedHeroes.map(h => h.armor).reduce((a, b) => { return a + b; }, 0),
@@ -389,28 +390,29 @@ const combineModels = (selectedHeroes, partyName) => {
     // provide incentives for making a diverse group of heroes. A warrior in the party will add extra armor, a thief extra weapon damage, 
     // a cleric, extra hp, and a wizard extra spell damage 
     if (partyOfHeroes.class.includes("Warrior")) {
-        console.log(partyOfHeroes.armor)
+        // Not really sure why I have to use Math.floor here. 
+        // Function returns, for example 3 * 1.1 = 3.3000000000000003 without it. That makes no sense. 
         partyOfHeroes.armor *= Math.floor(1.1); 
         partyOfHeroes.blockChance *= Math.floor(1.1);
-        partyOfHeroes.bonusString.push(`10% armor and block chance`);
+        partyOfHeroes.bonusString.push(`${" "}10% armor and block chance`);
     }
     if (partyOfHeroes.class.includes("Wizard")) {
         partyOfHeroes.spells.damageLow *= Math.floor(1.1); 
         partyOfHeroes.spells.damageHigh *= Math.floor(1.1);
-        partyOfHeroes.bonusString.push(`10% spell damage`);
+        partyOfHeroes.bonusString.push(`${" "}10% spell damage`);
     }
     if (partyOfHeroes.class.includes("Thief")) {
         partyOfHeroes.weapon.damageLow *= Math.floor(1.1); 
         partyOfHeroes.weapon.damageHigh *= Math.floor(1.1);
-        partyOfHeroes.bonusString.push(`10% weapon damage`);
+        partyOfHeroes.bonusString.push(`${" "}10% weapon damage`);
     }
     if (partyOfHeroes.class.includes("Cleric")) {
         partyOfHeroes.hp *= Math.floor(1.1);
-        partyOfHeroes.bonusString.push(`10% hp`);
+        partyOfHeroes.bonusString.push(`${" "}10% hp`);
     }
     // Generate a string depicting the party's bonus
     // insert an "and" aftert he second to last item in the array, however long it is.
-    partyOfHeroes.bonusString.splice(partyOfHeroes.bonusString.length - 1, 0, `and`);
+    // partyOfHeroes.bonusString.splice(partyOfHeroes.bonusString.length - 1, 0, `and`);
     return partyOfHeroes
 }
 

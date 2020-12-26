@@ -9,13 +9,9 @@ let menuRoutes = [
     },
     {
         path: '/create', view: 'menu', title: "Create",
-        options: { heading: 'CREATE', src: 'https://via.placeholder.com/700x350?text=placeholder_create_menu', alt: 'PLACEHOLDER' },
+        options: { heading: 'CREATE', src: 'http://via.placeholder.com/700x350?text=placeholder_create_menu', alt: 'PLACEHOLDER' },
         menuOptions: [{ option: "Hero", href: "./create/hero" }, { option: "Monster", href: "./create/monster" }, { option: 'Party', href: "./create/party" }, { option: "Dungeon", href: "./create/dungeon" }, { option: "Main Menu", href: "./" }]
     },
-    // { path: '/create/hero', view: 'createHero', title: "Create Hero" },
-    // { path: "/create/monster", view: 'createMonster', title: "Create Monster" },
-    // { path: "/create/party", view: 'createParty', title: "Create Party" },
-    // { path: "/create/dungeon", view: 'createDungeon', title: "Create Dungeon" },
     {
         path: '/view', view: 'menu', title: "View",
         options: { heading: 'VIEW', src: './assets/book.png', alt: 'A mysterious book' },
