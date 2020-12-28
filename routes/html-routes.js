@@ -1,8 +1,6 @@
 const db = require('../models');
 const fn = require('../CLI/functions');
 const menuRoutes = require('./menuRoutes');
-const createRoutes = require('./createRoutes')
-
 
 module.exports = (app) => {
     // There are dozens of menus, but all of the path names, view names, and content are very similar
@@ -17,6 +15,7 @@ module.exports = (app) => {
     // Nearly all the viewers are identical, so a similar dynamic map is used to create all of the viewer routes as well
     app.get('/view/:Model', (req, res) => {
         // Figure out what kind of Model to use based on req.params
+        // this switchboard is redundant and will get turned into a "helper function" that returns the needed values
         let modelType;
         switch (req.params.Model) {
             case "Dungeon":
@@ -46,50 +45,60 @@ module.exports = (app) => {
 
     // Similar to mapped menus, viewers are also generated conditionally
     app.get('/view/:Model/:id', async function (req, res) {
+        let type;
         let modelType;
         let view;
         switch (req.params.Model) {
             case "Monster":
                 modelType = db.Monster;
-                view = 'monsterViewer'
+                view = 'monsterViewer';
+                type = 'monster';
                 break;
             case "Party":
                 modelType = db.Party;
-                view = 'heroViewer'
+                view = 'heroViewer';
+                type = 'party';
+                break;
+            case "Dungeon":
+                modelType = db.Dungeon;
+                view = 'dungeonViewer';
+                type = 'dungeon';
                 break;
             default:
                 modelType = db.Hero;
-                view = 'heroViewer'
+                view = 'heroViewer';
+                type = 'hero';
         };
         let title;
         let model;
         await modelType.findOne({ _id: req.params.id }).then(result => {
-            model = result
-            title = `${model.name} - Level ${model.level}`
+            model = result;
+            title = `${model.name} - Level ${model.level}`;
+            if (model.class) { title = `${model.name} - Level ${model.level} ${model.class}` }
         })
         switch (req.params.Model) {
             // party needs a little extra prepartion
             case "Party":
                 db.Party.findOne({ _id: req.params.id }).then(party => {
                     let partyName = party.name
-                    db.Hero.find({ '_id': { $in: party.heroes.map(hero => hero._id) } }).then(result => {
+                    db.Hero.find({ '_id': { $in: party.heroes.map(hero => hero) } }).then(result => {
                         model = fn.combineModels(result, partyName)
                         model.bonusString = "The party gains: " + model.bonusString.join(", ");
                         res.render(view, {
-                            view: view, title: title,
-                            options: { heading: title, src: `https://via.placeholder.com/300x650?text=${model.name}`, alt: `${model.name}` },
-                            menuOptions: [{ option: "Main Menu", href: "http://localhost:8080" }],
+                            view: view, title: title, type: type,
+                            options: { heading: title, src: `${model.sprite}`, alt: `${model.name}` },
+                            menuOptions: [{ option: "Main Menu", href: "/" }],
                             model: model
                         });
                     });
                 });
                 break;
             default:
-                // hero/monster is ready to go as-is
+                // hero/monster/dungeon is ready to go as-is
                 res.render(view, {
-                    view: view, title: title,
-                    options: { heading: title, src: `https://via.placeholder.com/300x650?text=${model.name}`, alt: `${model.name}` },
-                    menuOptions: [{ option: "Main Menu", href: "http://localhost:8080" }],
+                    view: view, title: title, type: type,
+                    options: { heading: title, src: `${model.sprite}`, alt: `${model.name}` },
+                    menuOptions: [{ option: "Main Menu", href: "/" }],
                     model: model
                 });
         };
@@ -98,17 +107,45 @@ module.exports = (app) => {
     app.get('/create/:modelType', (req, res) => {
         switch (req.params.modelType) {
             case "hero":
-                res.render('createHero', { title: `Create Hero` })
+                res.render('createHero', { title: `Create Hero` });
                 break;
             case "monster":
+                res.render('createMonster', { title: `Create Monster` });
                 break;
             case "party":
+                db.Hero.find({}).then(results => {
+                    res.render('createParty', { title: `Create Party`, heroes: results });
+                })
                 break;
             case "dungeon":
+                res.render('createDungeon', { title: `Create Dungeon` });
                 break;
         }
-        console.log(req.params.modelType)
-    // res.render(route.view, { title: route.title })
+    });
+
+    app.get('/confirm/delete/:model/:id', (req, res) => {
+        let modelType;
+        let type;
+        switch (req.params.model) {
+            case "monster":
+                modelType = db.Monster;
+                type = 'monster';
+                break;
+            case "party":
+                modelType = db.Party;
+                type = 'party';
+                break;
+            case "dungeon":
+                modelType = db.Dungeon;
+                type = 'dungeon';
+                break;
+            default:
+                modelType = db.Hero;
+                type = 'hero';
+        };
+        modelType.findOne({ _id: req.params.id }).then(result => {
+            res.render('confirmDelete', { title: `Delete ${result.name}`, model: result, type: type });
+        })
     });
 
 

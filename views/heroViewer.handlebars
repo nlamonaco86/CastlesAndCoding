@@ -9,44 +9,75 @@
     <div class="row">
 
         <div class="col-lg-5 d-flex justify-content-center">
-            <img src="{{model.sprite}}" style="max-height:100%;max-width:100%"></img>
+            <div class="row">
+                <img src="{{model.sprite}}" style="max-height:100%;max-width:100%"></img>
+                <div class="row">
+                    <div class="d-flex justify-content-center"><a href="/confirm/delete/{{type}}/{{model._id}}" class="a">Delete</a></div>
+                </div>
+            </div>
+
         </div>
 
         <div class="col-lg-7">
-          <div class="row">
-              <div class="d-flex justify-content-evenly"><div>HP: <span>{{model.hp}}</span></div><div>Armor: <span>{{model.armor}}</span></div></div>
-              <div class="d-flex justify-content-evenly"><div>Crit %: <span>{{model.critChance}}</span></div><div>Block %: <span>{{model.blockChance}}</span></div></div>
-              <div class="d-flex justify-content-evenly"><div>XP: <span class="text-info">{{model.xp}}</span></div><div>Gold: <span class="text-warning">{{model.gold}}</span></div></div>
+            <div class="row">
+                <div class="d-flex justify-content-evenly">
+                    <div>HP: <span>{{model.hp}}</span></div>
+                    <div>Armor: <span>{{model.armor}}</span></div>
+                </div>
+                <div class="d-flex justify-content-evenly">
+                    <div>Crit %: <span>{{model.critChance}}</span></div>
+                    <div>Block %: <span>{{model.blockChance}}</span></div>
+                </div>
+                <div class="d-flex justify-content-evenly">
+                    <div>XP: <span class="text-info">{{model.xp}}</span></div>
+                    <div>Gold: <span class="text-warning">{{model.gold}}</span></div>
+                </div>
 
-              <div class="d-flex justify-content-center mt-2">
-                 <div class="" style="border:double;border-width:10px;padding:12px">
-                    <div class="d-flex justify-content-center"><div>Weapon: <span>{{model.weapon.name}}</span></div></div>
-                    <div class="d-flex justify-content-center"><div><span>{{model.weapon.damageLow}}-{{model.weapon.damageHigh}}</span> damage</div></div>
-              </div>              
+                <div class="d-flex justify-content-center mt-2">
+                    <div class="" style="border:double;border-width:10px;padding:12px">
+                        <div class="d-flex justify-content-center">
+                            <div>Weapon: <span>{{model.weapon.name}}</span></div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div><span>{{model.weapon.damageLow}}-{{model.weapon.damageHigh}}</span> damage</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <div class="" style="border:double;border-width:10px;padding:12px">
+                        <div class="d-flex justify-content-center">
+                            <div>Spell: <span>{{model.spells.name}}</span></div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div><span class="text-danger">{{model.spells.damageLow}}-{{model.spells.damageHigh}}</span>
+                                damage</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <div class="" style="border:double;border-width:10px;padding:12px">Inventory:
+                        <div class="d-flex justify-content-center">
+                            <div><span>{{model.inventory}}</span></div>
+                        </div>
+                    </div>
+                    <div id="_id" style="display:none;">{{model._id}}</div>
+                </div>
             </div>
-            <div class="d-flex justify-content-center mt-4">
-                 <div class="" style="border:double;border-width:10px;padding:12px">
-                    <div class="d-flex justify-content-center"><div>Spell: <span>{{model.spells.name}}</span></div></div>
-                    <div class="d-flex justify-content-center"><div><span class="text-danger">{{model.spells.damageLow}}-{{model.spells.damageHigh}}</span> damage</div></div>
-                 </div>
-          </div>
-                      <div class="d-flex justify-content-center mt-4">
-                 <div class="" style="border:double;border-width:10px;padding:12px">Inventory:
-                    <div class="d-flex justify-content-center"><div><span>{{model.inventory}}</span></div></div>
-                 </div>
-          </div>
         </div>
-    </div> 
 
-    <div class="text-center">
-        {{#each menuOptions}}
-        {{> menuLink}}
-        {{/each}}
+        <div class="text-center">
+            {{#each menuOptions}}
+            {{> menuLink}}
+            {{/each}}
+        </div>
+
     </div>
+    <style>
+        span {
+            color: #5cb85c;
+        }
 
-</div>
-<style>
-    span {
-        color: #5cb85c;
-    }
-</style>
+        img {
+            max-width: 100%;
+        }
+    </style>

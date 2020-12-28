@@ -1,0 +1,36 @@
+<div class="container mt-5 vt" style="border:double;color:white;border-width:15px;max-Width: 950px;">
+
+    <div class="row text-center vt-lg" id="main">
+        <div class="vt-md" id="errorBox"></div>
+        <h1 class="vt-lg text-white mt-4">Delete {{model.name}}</h1>
+        <p class="vt-md">This action cannot be undone.</p>
+        <h2 class="vt-lg text-danger mt-4">Are you sure?</h2>
+        <p class="a mt-5" id="delete">Yes</p>
+        <a class="a mt-5 mb-5" href="/">No</a>
+        <div style="display:none;" id="type">{{type}}</div>
+        <div style="display:none;" id="id">{{model._id}}</div>
+    </div>
+
+</div>
+<script>
+    let deleteBtn = document.getElementById('delete');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            let type = document.getElementById('type').textContent;
+            let id = document.getElementById('id').textContent;
+
+            fetch(`/confirm/delete/${type}/${id}/yes`, { method: "DELETE" }).then((response) => {
+                    if (response.err) { document.getElementById('errorBox').innerHTML = "An error occured, please try again"; }
+                    document.getElementById('main').innerHTML = `<h1 class="vt-lg text-white mt-4">{{model.name}} was deleted!</h1>`
+                    setTimeout(() => { location.replace(response.url); }, 1500);
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                });
+
+
+        })
+    }
+</script>

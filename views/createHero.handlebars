@@ -5,11 +5,11 @@
     <div class="row justify-content-around container">
 
         <div class="col-lg-6 ">
-            <img src="" class="img-fluid" alt=""></img>
+            <img src="https://via.placeholder.com/350x550?text=placeholder__image" class="img-fluid mb-4" alt=""></img>
         </div>
 
         <div class="col-lg-6">
-            <div class="vt-lg d-flex justify-content-center">
+            <div class="vt-lg d-flex justify-content-center mt-2">
                 <p class="vt-sm text-danger" id="errorBox"></p>
             </div>
             <form id="createHero">
@@ -34,15 +34,13 @@
                 </div>
                 <div className="row">
                     <div class="d-flex justify-content-center">
-                        {{!-- onclick="document.getElementById('createHere').submit();" --}}
-                        <a class="a" href="javascript:{}" style="font-size:48px;" id="createBtn">CREATE</a>
-                        {{!-- <button class="text-white bg-danger" style="text-decoration:none">CREATE</button> --}}
+                        <a class="a" href="javascript:{}" style="font-size:48px;" id="createBtn">Create</a>
                     </div>
                 </div>
             </form>
 
             <div class="text-center text-danger mb-2">
-                <div class="vt-lg"><a href="../" class="a">MAIN MENU</a></div>
+                <div class="vt-lg"><a href="../" class="a">Main Menu</a></div>
             </div>
 
         </div>
@@ -93,14 +91,14 @@
                 answers.weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; answers.spells = { name: "word of power", damageLow: 8, damageHigh: 12 };
                 answers.blockChance = 10;
             };
-            fetch('../api/create/hero', {
+            fetch('../api/create/Hero', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
                 body: JSON.stringify(answers),
             })
                 .then(response => {
                     if (response.err) {  document.getElementById('errorBox').innerHTML = "An error occured, please try again"; }
-                    window.location.replace("/");
+                    location.replace(response.url);
                 })
                 .catch((error) => {
                     console.log('Error:', error);

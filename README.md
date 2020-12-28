@@ -9,7 +9,7 @@ As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an h
 to classic text-based roleplaying games of the past.
 ```
 
-C&C is currently played entirely from the command line in your Node.js console. A front end, playable from your browser, is currently under development. 
+C&C is currently played entirely from the command line in your Node.js console as per the directions below. A front end, playable from the browser, is currently under development. 
 
 ## Text-Based Character & Monster Creation
 
@@ -73,6 +73,5 @@ A tabletop RPG is less a of a game and more of a framework and set of tools - th
 - Robust documentation for all aspects of how to play the game.
 
 ![GUI](./screenshots/screenshot9.png)
-![raiding a dungeon](./screenshots/screenshot7.png)
-![viewing a hero](./screenshots/screenshot5.png)
-![visiting a shop](./screenshots/screenshot8.png)
+![raiding a dungeon](./screenshots/screenshot11.png)
+![viewing a hero](./screenshots/screenshot10.png)

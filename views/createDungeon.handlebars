@@ -1,0 +1,196 @@
+<div class="container mt-5 vt" style="border:double;color:white;border-width:15px">
+
+    <div class="row justify-content-center text-danger vt-lg">Create Dungeon</div>
+
+    <div class="row justify-content-around container">
+
+        <div class="vt-lg d-flex justify-content-center">
+            <p class="vt-sm text-danger" id="errorBox"></p>
+        </div>
+
+        {{!-- <div class="col-lg-6 ">
+            <img src="" class="img-fluid" alt=""></img>
+        </div> --}}
+
+        <div class="col-lg-12">
+
+            <div class="row">
+
+                <form class="createMonster vt-sm">
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <img src="http://via.placeholder.com/500x200?text=ancient_ruins"></img>
+                            </div>
+                            <div class="row">
+                                <h4 class="vt-lg text-danger text-center">Dungeon:</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <label for="name">Name</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="dungeonName"
+                                        placeholder="Name">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="level">Level</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="dungeonLevel"
+                                        placeholder="Level">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="name">Gold</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="dungeonGold"
+                                        placeholder="Gold">
+                                </div>
+                                <div class="col-lg-8">
+                                    <label for="treasure">Treasure</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="treasure"
+                                        placeholder="Treasure">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label for="name">Description</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="dungeonDescription"
+                                        placeholder="Describe the dungeon">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row mt-4">
+                                <h4 class="vt-lg text-danger text-center">Boss:</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <label for="name">Name</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="name"
+                                        placeholder="Name">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="level">Level</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="level"
+                                        placeholder="Level">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="hp">HP</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="hp"
+                                        placeholder="0">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="xp">XP</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="xp"
+                                        placeholder="0">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="armor">Armor</label>
+                                    <input type="armor" class="form-control bg-dark text-white" id="armor"
+                                        placeholder="0">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="damage" className="">Damage: Low</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="damageLow"
+                                        placeholder="Low">
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="damage" className="">High</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="damageHigh"
+                                        placeholder="High"></input>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="crit">Crit %</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="critChance"
+                                        placeholder="0">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="block">Block %</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="blockChance"
+                                        placeholder="0">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="gold">Gold</label>
+                                    <input type="number" class="form-control bg-dark text-white" id="gold"
+                                        placeholder="0"></input>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label for="description">Description</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="description"
+                                        placeholder="Describe the monster...">
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-4">
+                        <div class="d-flex justify-content-center">
+                            <a class="a" href="javascript:{}" style="font-size:48px;" id="createBtn">Create</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="text-center text-danger mb-2">
+                <div class="vt-lg"><a href="../" class="a">Main Menu</a></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    document.getElementById("createBtn").addEventListener('click', (event) => {
+        event.preventDefault();
+        if (document.getElementById('hp').value.length < 1) {
+            document.getElementById('errorBox').innerHTML = "Please check your entry, and try again";
+        }
+        else {
+            let dungeon = {
+                name: document.getElementById('dungeonName').value,
+                level: document.getElementById('dungeonLevel').value,
+                gold: document.getElementById('dungeonGold').value,
+                treasure: document.getElementById('treasure').value,
+                description: document.getElementById('dungeonDescription').value,
+                boss: {
+                    name: document.getElementById('name').value,
+                    hp: document.getElementById('hp').value,
+                    armor: document.getElementById('armor').value,
+                    damageLow: document.getElementById('damageLow').value,
+                    damageHigh: document.getElementById('damageHigh').value,
+                    critChance: document.getElementById('critChance').value,
+                    blockChance: document.getElementById('blockChance').value,
+                    gold: document.getElementById('gold').value,
+                    xp: document.getElementById('xp').value,
+                    level: document.getElementById('level').value,
+                    taunt: document.getElementById('description').value
+                }
+            };
+
+            fetch('../api/create/Dungeon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify(dungeon),
+            })
+                .then(response => {
+                    if (response.err) { document.getElementById('errorBox').innerHTML = "An error occured, please try again"; }
+                    location.replace(response.url);
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                });
+        }
+    })
+</script>

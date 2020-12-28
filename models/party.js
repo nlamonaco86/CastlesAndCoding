@@ -4,6 +4,7 @@ let Schema = mongoose.Schema;
 let party = new Schema({
     name: { type: String, required: true },
     level: Number,
+    sprite: "",
     heroes: []
 });
 
