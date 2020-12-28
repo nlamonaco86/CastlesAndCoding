@@ -9,7 +9,9 @@ As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an h
 to classic text-based roleplaying games of the past.
 ```
 
-C&C is currently played entirely from the command line in your Node.js console as per the directions below. A front end, playable from the browser, is currently under development. 
+C&C is currently played entirely from the command line in your Node.js console as per the directions below. 
+
+A front end, playable from the browser and themed afetr classic text-based role playing games, is currently under development. 
 
 ## Text-Based Character & Monster Creation
 
@@ -39,7 +41,7 @@ Visit the town, where heroes can enter a shop to buy and sell items to non-playe
 
 ## Instructions
 
-Simply clone the repository, and in the root directory
+Clone the repository, and in the root directory
 ```
 npm install
 ```
