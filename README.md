@@ -9,13 +9,11 @@ As a longtime fan of tabletop gaming and computer roleplaying games, C&C is an h
 to classic text-based roleplaying games of the past.
 ```
 
-C&C is currently played entirely from the command line in your Node.js console as per the directions below. 
-
 A front end, playable from the browser and themed afetr classic text-based role playing games, is currently under development. 
 
 ## Text-Based Character & Monster Creation
 
-Players can create personalized hero and monster characters complete with their own stats, equipment, inventory, and gold, using the provided functions, all from Node.js.
+Players can create personalized hero and monster characters complete with their own stats, equipment, inventory, and gold.
 
 Monsters can also be randomly generated and will scale with the hero's stats - the stronger the hero, the more fearsome the monsters will be.
 
@@ -56,10 +54,14 @@ Navigate to to ./seeds
 node seed
 ```
 
-Then, navigate to to ./CLI
+To play in the browser:
+
+navigate to the root directory:
+
 ```
-node cnc
+node server
 ```
+
 
 [Have fun storming the castle!](https://www.youtube.com/watch?v=AjUmULa0R-8)
 
@@ -68,8 +70,7 @@ node cnc
 A tabletop RPG is less a of a game and more of a framework and set of tools - though seed data is provided for an example of play, you're encouraged to create your own heroes, monsters, and dungeons. You can modify the hero and monster stats and rewards calculations for a unique and endless experience. 
 
 ## Future Development
-- Create a front-end UI styled after classic text-based role-playing computer games. 
- 
+
 - Turn-based structure to the game for a more laid-back user experience. 
 
 - Robust documentation for all aspects of how to play the game.
@@ -77,3 +78,12 @@ A tabletop RPG is less a of a game and more of a framework and set of tools - th
 ![GUI](./screenshots/screenshot9.png)
 ![raiding a dungeon](./screenshots/screenshot11.png)
 ![viewing a hero](./screenshots/screenshot10.png)
+![battle a monster](./screenshots/screenshot12.png)
+
+## From a Technical Standpoint
+
+The game makes use of Express, MongoDB, and Express-Handblebars. It makes extensive use of dyanmic routing with mapped routes and req.params to put together the various database queries server side. Once the queries are assembled, the appropriate models are pulled from the database. The server makes extensive use of ES6, Javascript's prototype and the Math object to accomplish the basis of the role playing game's function in conjunction with asynchronous functions.
+
+## Contributions
+
+If you or anyone you know is interested in contributing pixel art, gameplay or design assets, or would simply like to know more about the project, contact me at nlamonaco86@gmail.com

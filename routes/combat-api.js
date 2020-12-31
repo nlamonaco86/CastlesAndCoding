@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const db = require("../models");
 const { v4: uuidv4 } = require('uuid');
-const { clearLine } = require("inquirer/lib/utils/readline");
 
 mongoose.connect("mongodb://localhost/cncDb", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -49,7 +48,7 @@ const createRandomMonster = (hero) => {
     // Ensure some "quality" among monsters, by preventing strange damage outputs
     // if max damage is higher than min, try again
     if (monsterData.damageHigh < monsterData.damageLow) { createRandomMonster(hero); }
-    else { db.Monster.create(monsterData); return monsterData };
+    else { return monsterData };
 };
 
 // Calculate damage to deal
@@ -70,21 +69,18 @@ let calcHeroDamage = (model) => {
     }
     // cleric and wizard use random spells from their "Spellbook" array
     if (model.class === "Wizard") {
-        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
-        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+        for (let i = model.spells.damageLow; i <= model.spells.damageHigh; i++) {
             possibleDamage.push(i);
         }
     }
     if (model.class === "Cleric") {
-        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
-        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+        for (let i = model.spells.damageLow; i <= model.spells.damageHigh; i++) {
             possibleDamage.push(i);
         }
     }
     else {
         // This must be a party of heroes! push all possible weapon & spell damage outcomes to the array
-        let chosenSpell = model.spells[Math.floor(Math.random() * model.spells.length)]
-        for (let i = chosenSpell.damageLow; i <= chosenSpell.damageHigh; i++) {
+        for (let i = model.spells.damageLow; i <= model.spells.damageHigh; i++) {
             possibleDamage.push(i);
         }
         for (let i = model.weapon.damageLow; i <= model.weapon.damageHigh; i++) {
@@ -142,7 +138,8 @@ const epicShowdown = (hero, monster) => {
     let heroLife = hero.hp;
     let monsterLife = monster.hp;
     // Keep track of the status of the battle (it's so exciting...)
-    let battleStatus = [];
+    // it starts with both life totals and the monster's opening message/description in it
+    let battleStatus = [`${monster.taunt}`, `${hero.name}: ${Math.floor(heroLife)} HP, ${monster.name}: ${Math.floor(monsterLife)} HP`];
     // The battle does not end until someone is defeated
     while (1) {
         // take turns dealing damage to each other until someone's HP reaches 0 or less
@@ -158,35 +155,39 @@ const epicShowdown = (hero, monster) => {
         // Push each "turn" taken to the array, log crit messages and prevent logging "junk" negative crits
         if (dmgIn.msg && dmgIn.dmg >= 0) { battleStatus.push(dmgIn.msg) }
         if (dmgOut.msg && dmgOut.dmg >= 0) { battleStatus.push(dmgOut.msg) }
-        battleStatus.push({ heroHP: heroLife, monsterHP: monsterLife });
+        battleStatus.push(`${hero.name}: ${heroLife} HP, ${monster.name}: ${monsterLife} HP`);
 
         // Victory!
         if (monsterLife <= 0) {
             // Choose a random item from the monster's inventory
             let loot = monster.inventory[Math.floor(Math.random() * monster.inventory.length)]
+            // push more data to the array
+            battleStatus.push(`${hero.name} has slain the ${monster.name}!`, `${monster.name} dropped ${loot} and ${monster.gold} gold.`, `${hero.name} has gained ${monster.xp} XP.`)
             // Create an object to display in the console
-            let heroWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, taunt: monster.taunt, combatLog: battleStatus, victory: true, message: `${hero.name} has slain the ${monster.name}!`, loot: loot, gold: monster.gold, xp: monster.xp }
+            let heroWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, combatLog: battleStatus, victory: true }
             // If the group is NOT a party 
             if (Array.isArray(hero.class) === false) {
                 // create a battle record in the database, run the loot function
-                db.Battle.create(heroWins).then(result => {
-                });
+                // db.Battle.create(heroWins).then(result => {
+                // });
                 lootMonster(hero, monster, loot);
                 return heroWins;
             }
             // Loot is not supported for raid battles (yet)
             else {
-                db.Battle.create(heroWins).then(result => {
-                });
+                // db.Battle.create(heroWins).then(result => {
+                // });
                 return heroWins;
             }
-
         }
         // Defeat :(
         if (heroLife <= 0) {
-            let monsterWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, taunt: monster.taunt, combatLog: battleStatus, victory: false, message: `${hero.name} has been defeated by the ${monster.name}!`, lastWords: heroDeath(hero) }
-            db.Battle.create(monsterWins).then(result => { });
-            // Lose 30 gold on death to a monster
+             // push more data to the array
+             battleStatus.push(`${hero.name} was defeated by ${monster.name}!`, `${hero.name} dropped 30 gold.`, `"${hero.lastWords}"`)
+             // Create an object to display in the console
+             let monsterWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, combatLog: battleStatus, victory: false }
+             // db.Battle.create(monsterWins).then(result => { });
+            // // Lose 30 gold on death to a monster
             transferItem(monster._id, db.Monster, hero._id, db.Hero, "penalty", 30);
             return monsterWins;
         }
@@ -207,18 +208,17 @@ const chooseTwo = async function (heroWhere, monsterWhere) {
 };
 
 // battle against randomly generated monsters until the hero loses
-const untilYouLose = async function (where) {
-    let hero = await db.Hero.findOne(where);
-    let monster = createRandomMonster(hero);
+const untilYouLose = async function (hero, monster) {
     let score = 0;
+    let randomMonsterBattles = [];
     while (1) {
         // Battle the hero against a monster until the hero is defeated
         let status = epicShowdown(hero, monster);
         // On win, log the results and continue to another battle
         // generate a different monster for the next battle
-        if (status.victory === true) { chronicle(status); monster = createRandomMonster(hero); score = score + 1; }
-        // On loss, log the results and stop
-        else { return chronicle(status, score); };
+        if (status.victory === true) { randomMonsterBattles.push(status.combatLog); monster = createRandomMonster(hero); score = score + 1; }
+        // On loss, log the results and stop, combine the array of arrays into a single array for more logical rendering
+        else { randomMonsterBattles.push(status.combatLog, `${hero.name} defeated ${score} monsters`); return randomMonsterBattles.join(); };
     };
 };
 
@@ -265,15 +265,15 @@ const lootMonster = (hero, monster, loot) => {
         // for thief/warrior boost their weapon damage, for cleric/wizard boost their spells
         if ( hero.xp >= hero.level * 75 ) {
             if ( hero.class == "Warrior" || hero.class == "Thief") {
-            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: hero.hp * 1.1, armor: hero.armor * 1.1, critChance: hero.critChance * 1.1,
-                    blockChance: hero.blockChance * 1.1, weapon: { name: hero.weapon.name, damageLow: hero.weapon.damageLow * 1.2,
-                        damageHigh: hero.weapon.damageHigh * 1.1 } }, { new: true }).then(hero => {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                    blockChance: Math.round(hero.blockChance * 1.1), weapon: { name: hero.weapon.name, damageLow: Math.round(hero.weapon.damageLow * 1.2),
+                        damageHigh: Math.round(hero.weapon.damageHigh * 1.1) } }, { new: true }).then(hero => {
                             console.log(`${hero.name} has reached level ${hero.level}!`)
             });
         }
         else {
-            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: hero.hp * 1.1, armor: hero.armor * 1.1, critChance: hero.critChance * 1.1,
-                blockChance: hero.blockChance * 1.1, spells: [{name: hero.spells.name, damageLow: hero.spells.damageLow * 1.2, damageHigh: hero.spells.damageHigh * 1.2}] }, { new: true }).then(hero => {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                blockChance: Math.round(hero.blockChance * 1.1), spells: {name: hero.spells.name, damageLow: Math.round(hero.spells.damageLow * 1.2), damageHigh: Math.round(hero.spells.damageHigh * 1.2) } }, { new: true }).then(hero => {
                         console.log(`${hero.name} has reached level ${hero.level}!`)
                     });
         }
@@ -358,9 +358,9 @@ const swapItem = (model, modelWhere, swapIn) => {
     });
 };
 
-const combineModels = (selectedHeroes, partyName) => {
+const combineModels = (selectedHeroes, partyName, _id) => {
     let partyOfHeroes = {
-        _id: selectedHeroes.map(h => h._id),
+        _id: _id,
         name: partyName,
         heroes: selectedHeroes.map(h => `${" "}${h.name} - Level ${h.level} ${h.class}`),
         hp: selectedHeroes.map(h => h.hp).reduce((a, b) => { return a + b; }, 0),

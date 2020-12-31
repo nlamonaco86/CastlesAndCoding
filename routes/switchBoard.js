@@ -1,5 +1,6 @@
 const db = require('../models');
 
+// takes in req.params.Model and returns an object with the 3 pieces of info needed for rendering
 const switchBoard = (input) => {
     let object = {
         modelType: '',
@@ -7,25 +8,25 @@ const switchBoard = (input) => {
         type: ''
     };
     switch (input) {
-        case "Monster":
+        case "monster":
             object.modelType = db.Monster;
             object.view = 'monsterViewer';
-            object.type = 'Monster';
+            object.type = 'monster';
             break;
-        case "Party":
+        case "party":
             object.modelType = db.Party;
             object.view = 'heroViewer';
-            object.type = 'Party';
+            object.type = 'party';
             break;
-        case "Dungeon":
+        case "dungeon":
             object.modelType = db.Dungeon;
             object.view = 'dungeonViewer';
-            object.type = 'Dungeon';
+            object.type = 'dungeon';
             break;
         default:
             object.modelType = db.Hero;
             object.view = 'heroViewer';
-            object.type = 'Hero';
+            object.type = 'hero';
     };
     return object;
 }

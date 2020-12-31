@@ -55,7 +55,7 @@
             document.getElementById('errorBox').innerHTML = "Please check your entry, and try again";
         }
     else {
-            let answers = {
+            let hero = {
                 name: document.getElementById('name').value, hp: 20,
                 armor: 0,
                 class: document.getElementById('class').value,
@@ -72,29 +72,29 @@
             // modify the stats based on the hero's class
             // generally speaking, the warrior and cleric deal less damage but have more defenses
             // wizard and thief deal more damage, but have less defenses
-            if (answers.class === "Warrior") {
-                answers.hp += 10; answers.armor += 3;
-                answers.weapon = { name: "short sword", damageLow: 3, damageHigh: 6 }; answers.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
-                answers.blockChance = 10; answers.sprite = "/assets/warrior.png"
+            if (hero.class === "Warrior") {
+                hero.hp += 10; hero.armor += 3;
+                hero.weapon = { name: "short sword", damageLow: 3, damageHigh: 6 }; hero.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
+                hero.blockChance = 10; hero.sprite = "/assets/warrior.png";
             };
-            if (answers.class === "Wizard") {
-                answers.weapon = { name: "gnarled staff", damageLow: 1, damageHigh: 3 }; answers.spells = { name: "fireball", damageLow: 8, damageHigh: 12 };
-                answers.critChance = 10;
+            if (hero.class === "Wizard") {
+                hero.weapon = { name: "gnarled staff", damageLow: 1, damageHigh: 3 }; hero.spells = { name: "fireball", damageLow: 8, damageHigh: 12 };
+                hero.critChance = 10; hero.sprite = "/assets/wizard.png";
 
             };
-            if (answers.class === "Thief") {
-                answers.weapon = { name: "iron dagger", damageLow: 8, damageHigh: 12 }; answers.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
-                answers.critChance = 10;
+            if (hero.class === "Thief") {
+                hero.weapon = { name: "iron dagger", damageLow: 8, damageHigh: 12 }; hero.spells = { name: "I don't use magic.", damageLow: 0, damageHigh: 0 };
+                hero.critChance = 10; hero.sprite = "/assets/thief.png";
             };
-            if (answers.class === "Cleric") {
-                answers.hp += 10; answers.armor += 3;
-                answers.weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; answers.spells = { name: "word of power", damageLow: 8, damageHigh: 12 };
-                answers.blockChance = 10;
+            if (hero.class === "Cleric") {
+                hero.hp += 10; hero.armor += 3;
+                hero.weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; hero.spells = { name: "word of power", damageLow: 8, damageHigh: 12 };
+                hero.blockChance = 10; hero.sprite = "/assets/cleric.png";
             };
-            fetch('../api/create/Hero', {
+            fetch('../api/create/hero', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
-                body: JSON.stringify(answers),
+                body: JSON.stringify(hero),
             })
                 .then(response => {
                     if (response.err) {  document.getElementById('errorBox').innerHTML = "An error occured, please try again"; }

@@ -160,6 +160,7 @@
         else {
             let dungeon = {
                 name: document.getElementById('dungeonName').value,
+                sprite: `https://via.placeholder.com/550x300?text=${document.getElementById('dungeonName').value}`,
                 level: document.getElementById('dungeonLevel').value,
                 gold: document.getElementById('dungeonGold').value,
                 treasure: document.getElementById('treasure').value,
@@ -179,7 +180,7 @@
                 }
             };
 
-            fetch('../api/create/Dungeon', {
+            fetch('../api/create/dungeon', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
                 body: JSON.stringify(dungeon),

@@ -19,7 +19,7 @@ let itemToScrap;
 
 const addHeroToDb = (name, hp, armor, occupation, weapon, critChance, blockChance, spells, lastWords) => {
     db.Hero.create({ name: name, sprite: "URL", hp: hp, armor: armor, xp: 0, level: 1, class: occupation, weapon: weapon, critChance: critChance, blockChance: blockChance, spells: spells, inventory: [], gold: 10, lastWords: lastWords }).then((hero) => {
-        let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, critChance: critChance, blockChance: blockChance, spells: hero.spells[0], gold: hero.gold, inventory: hero.inventory.join(", "), lastWords: hero.lastWords }
+        let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, critChance: critChance, blockChance: blockChance, spells: hero.spells, gold: hero.gold, inventory: hero.inventory.join(", "), lastWords: hero.lastWords }
         if (hero.class === "Wizard") { console.log(ascii.wizard) }
         if (hero.class === "Warrior") { console.log(ascii.warrior) }
         if (hero.class === "Cleric") { console.log(ascii.cleric) }
@@ -66,29 +66,29 @@ let cli = new function() {
     this.createHero =  () => {
         inquirer.prompt(questions.createHero).then(answers => {
             // Base stats for all heroes
-            let hp = 20
-            let armor = 0
-            let weapon = {}
-            let spells = []
+            let hp = 20;
+            let armor = 0;
+            let weapon = {};
+            let spells = {};
             // modify the stats based on the hero's class
             // generally speaking, the warrior and cleric deal less damage but have more defenses
             // wizard and thief deal more damage, but have less defenses
             if (answers.class === "Warrior") {
                 hp += 10; armor += 3;
-                weapon = { name: "short sword", damageLow: 3, damageHigh: 6 }; spells = [{ name: "I don't do magic.", damageLow: 0, damageHigh: 0 }];
+                weapon = { name: "short sword", damageLow: 3, damageHigh: 6 }; spells = { name: "I don't do magic.", damageLow: 0, damageHigh: 0 };
                 addHeroToDb(answers.name, hp, armor, answers.class, weapon, 5, 10, spells, answers.lastWords);
             };
             if (answers.class === "Wizard") {
-                weapon = { name: "gnarled staff", damageLow: 1, damageHigh: 3 }; spells = [{ name: "fireball", damageLow: 8, damageHigh: 12 }];
+                weapon = { name: "gnarled staff", damageLow: 1, damageHigh: 3 }; spells = { name: "fireball", damageLow: 8, damageHigh: 12 };
                 addHeroToDb(answers.name, hp, armor, answers.class, weapon, 10, 5, spells, answers.lastWords);
             };
             if (answers.class === "Thief") {
-                weapon = { name: "iron dagger", damageLow: 8, damageHigh: 12 }; spells = [{ name: "I don't do magic.", damageLow: 0, damageHigh: 0 }];
+                weapon = { name: "iron dagger", damageLow: 8, damageHigh: 12 }; spells = { name: "I don't do magic.", damageLow: 0, damageHigh: 0 };
                 addHeroToDb(answers.name, hp, armor, answers.class, weapon, 10, 5, spells, answers.lastWords);
             };
             if (answers.class === "Cleric") {
                 hp += 10; armor += 3;
-                weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; spells = [{ name: "word of power", damageLow: 8, damageHigh: 12 }];
+                weapon = { name: "bronze scepter", damageLow: 1, damageHigh: 3 }; spells = { name: "word of power", damageLow: 8, damageHigh: 12 };
                 addHeroToDb(answers.name, hp, armor, answers.class, weapon, 5, 10, spells, answers.lastWords);
             };
         }).then(result => {

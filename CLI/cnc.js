@@ -80,7 +80,7 @@ const menu = new function () {
                                     ]).then(result => {
                                         db.Hero.findOne({ name: result.choice.split(" ")[0] }).then(hero => {
                                             selectedHero = hero
-                                            let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
+                                            let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells, gold: hero.gold, lastWords: hero.lastWords }
                                             if (hero.class === "Wizard") { console.log(ascii.wizard) }
                                             if (hero.class === "Warrior") { console.log(ascii.warrior) }
                                             if (hero.class === "Cleric") { console.log(ascii.cleric) }
@@ -117,7 +117,7 @@ const menu = new function () {
                                                                 }
                                                             ]).then(item => {
                                                                 db.Hero.findOneAndUpdate({ _id: selectedHero._id }, { $push: { inventory: selectedHero.weapon }, weapon: JSON.parse(item.toEquip) }, { new: true }).then(hero => {
-                                                                    let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
+                                                                    let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells, gold: hero.gold, lastWords: hero.lastWords }
                                                                     console.table(result);
                                                                     this.main();
                                                                 });
@@ -151,7 +151,7 @@ const menu = new function () {
                                                 // of each to run a database call for a hero that matches, and console.table it 
                                                 // this works well as long as each name/level combo is unique, need validation on model creation
                                                 db.Hero.findOne({ name: hero.split(" ")[0], level: hero.split(" ")[3] }).then(hero => {
-                                                    let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells[0], gold: hero.gold, lastWords: hero.lastWords }
+                                                    let result = { name: hero.name, hp: hero.hp, armor: hero.armor, xp: hero.xp, level: hero.level, class: hero.class, weapon: hero.weapon, spells: hero.spells, gold: hero.gold, lastWords: hero.lastWords }
                                                     console.table(result);
                                                     console.log(`Inventory: ${hero.inventory.join(", ")}`)
                                                 })
@@ -290,11 +290,11 @@ const menu = new function () {
                                                                 damageHigh: selectedHeroes.map(h => h.weapon.damageHigh).reduce((a, b) => { return a + b; }, 0)
                                                             },
                                                             // for spells, create a spell much like the weapon
-                                                            spells: [{
+                                                            spells: {
                                                                 name: "The Might of Magic",
-                                                                damageLow: selectedHeroes.map(h => h.spells[0].damageLow).reduce((a, b) => { return a + b; }, 0),
-                                                                damageHigh: selectedHeroes.map(h => h.spells[0].damageHigh).reduce((a, b) => { return a + b; }, 0)
-                                                            }],
+                                                                damageLow: selectedHeroes.map(h => h.spells.damageLow).reduce((a, b) => { return a + b; }, 0),
+                                                                damageHigh: selectedHeroes.map(h => h.spells.damageHigh).reduce((a, b) => { return a + b; }, 0)
+                                                            },
                                                             gold: selectedHeroes.map(h => h.gold).reduce((a, b) => { return a + b; }, 0),
                                                             inventory: [],
                                                             lastWords: ""
@@ -307,7 +307,7 @@ const menu = new function () {
                                                             bonusString.push(`10% armor and block chance`);
                                                         }
                                                         if (partyOfHeroes.class.includes("Wizard")) {
-                                                            partyOfHeroes.spells[0].damageLow *= 1.1; partyOfHeroes.spells[0].damageHigh *= 1.1;
+                                                            partyOfHeroes.spells.damageLow *= 1.1; partyOfHeroes.spells.damageHigh *= 1.1;
                                                             bonusString.push(`10% spell damage`);
                                                         }
                                                         if (partyOfHeroes.class.includes("Thief")) {

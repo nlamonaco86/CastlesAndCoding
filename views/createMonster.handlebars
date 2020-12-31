@@ -94,6 +94,7 @@ document.getElementById("createBtn").addEventListener('click', (event) => {
   else {
     let monster = {
       name: document.getElementById('name').value,
+      sprite: "https://place-hold.it/300x450",
       hp: document.getElementById('hp').value,
       armor: document.getElementById('armor').value,
       damageLow: document.getElementById('damageLow').value,
@@ -106,7 +107,7 @@ document.getElementById("createBtn").addEventListener('click', (event) => {
       taunt: document.getElementById('description').value,
     };
 
-    fetch('../api/create/Monster', {
+    fetch('../api/create/monster', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', },
       body: JSON.stringify(monster),

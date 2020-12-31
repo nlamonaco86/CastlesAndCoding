@@ -3,6 +3,7 @@ let Schema = mongoose.Schema;
 
 let dungeon = new Schema({
   name: { type: String, required: true },
+  sprite: { type: String }, 
   description: { type: String },
   level: Number,
   monsters: [],

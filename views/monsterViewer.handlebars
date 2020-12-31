@@ -1,7 +1,7 @@
 <div class="container mt-5 vt" style="border:double;color:white;border-width:15px;">
 
     <div class="row text-center">
-        <h1 class="vt-lg text-danger">{{options.heading}}</h1>
+        <h1 class="vt-lg text-danger" style="text-transform: capitalize;">{{options.heading}}</h1>
     </div>
 
     <div class="row">
@@ -9,7 +9,7 @@
         <div class="col-lg-6 d-flex justify-content-center">
               
                 <div class="row">
-                      <img src="https://place-hold.it/300x450"></img>
+                      <img src="{{model.sprite}}"></img>
                     <div class="d-flex justify-content-center"><a href="/confirm/delete/{{type}}/{{model._id}}"
                             class="a">Delete</a></div>
                 </div>

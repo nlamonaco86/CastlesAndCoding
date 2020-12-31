@@ -78,10 +78,10 @@
                 return v.value;
             }),
             level: 1,
-            sprite: ""
+            sprite: "http://via.placeholder.com/600x350?text=party_of_heroes"
         }
         if (party.heroes.length <= 4 && party.heroes.length > 0 && document.getElementById("name").value != "") {
-            fetch('../api/create/Party', {
+            fetch('../api/create/party', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
                 body: JSON.stringify(party),
