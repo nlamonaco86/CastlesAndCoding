@@ -24,9 +24,8 @@ module.exports = async function (app) {
             let data = {
                 view: 'menu', title: `View ${req.params.model}`,
                 options: { heading: `View ${req.params.model}`, src: `https://via.placeholder.com/700x350?text=placeholder_${req.params.Model}_image`, alt: 'A mysterious book' },
-                menuOptions: models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.model}/${model._id}` }))
+                menuOptions: models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.model}/${model._id}` })).concat({ option: "Main Menu", href: "/" })
             };
-            data.menuOptions.push({ option: "Main Menu", href: "/" })
             res.render('menu', data);
         });
     });
@@ -47,8 +46,9 @@ module.exports = async function (app) {
                 db.Party.findOne({ _id: req.params.id }).then(party => {
                     let partyName = party.name
                     let _id = party._id
+                    let sprite = party.sprite
                     db.Hero.find({ '_id': { $in: party.heroes.map(hero => hero) } }).then(result => {
-                        model = fn.combineModels(result, partyName, _id)
+                        model = fn.combineModels(result, partyName, _id, sprite)
                         model.bonusString = "The party gains: " + model.bonusString.join(", ");
                         res.render(layout.view, {
                             title: title, type: layout.type,
@@ -102,31 +102,26 @@ module.exports = async function (app) {
             // each hero item will have a link containing a hero ID, monster ID and battle type
             // this link will take you to a battle
             let menuData = {
-                view: 'menu', title: `Select a Hero`,
-                options: { heading: `Select a Hero`, src: `https://via.placeholder.com/700x350?text=placeholder_Select_Hero`, alt: 'A mysterious book' },
-                menuOptions: ``
+                view: 'menu', options: { heading: `Select a Hero`, src: `https://via.placeholder.com/700x350?text=placeholder_Select_Hero`, alt: 'A mysterious book' },
+                menuOptions: [{ option: "Main Menu", href: "/" }]
             };
             // this is repetitive = break it down
             switch (req.params.type) {
                 case "monster":
-                    menuData.menuOptions = models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/chooseMonster` }))
-                    menuData.menuOptions.push({ option: "Main Menu", href: "/" })
+                    menuData.menuOptions = models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/chooseMonster` })).concat(menuData.menuOptions)
                     res.render('menu', menuData);
                     break;
                 case "dungeon":
                     db.Party.find({}).then(parties => {
-                        menuData.menuOptions = parties.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/chooseDungeon` }))
-                        menuData.menuOptions.push({ option: "Main Menu", href: "/" })
+                        menuData.options.heading = `Select a Party`
+                        menuData.menuOptions = parties.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/chooseDungeon` })).concat(menuData.menuOptions)
                         res.render('menu', menuData);
                     })
                     break;
                 case "untilYouLose":
-                    menuData.menuOptions = models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/randomMonster` }))
-                    menuData.menuOptions.push({ option: "Main Menu", href: "/" })
+                    menuData.menuOptions = models.map(model => ({ option: `${model.name} - Level ${model.level || " "} ${model.class || " "}`, href: `./${req.params.type}/${model._id}/randomMonster` })).concat(menuData.menuOptions)
                     res.render('menu', menuData);
                     break;
-
-
             }
 
         });
@@ -167,7 +162,7 @@ module.exports = async function (app) {
         let dungeon = await db.Dungeon.findOne({ _id: req.params.dungeonId });
         let assembleParty = await db.Party.findOne({ _id: req.params.partyId });
         let partyName = assembleParty.name
-        let battle = await fn.epicShowdown(fn.combineModels(await db.Hero.find({ '_id': { $in: assembleParty.heroes.map(hero => hero) } }), partyName), dungeon.boss);
+        let battle = await fn.epicShowdown(fn.combineModels(await db.Hero.find({ '_id': { $in: assembleParty.heroes.map(hero => hero) } }), partyName, null, assembleParty.sprite), dungeon.boss);
         res.render('battle', battle);
     });
 
@@ -177,6 +172,10 @@ module.exports = async function (app) {
         let combatLog = await fn.untilYouLose(hero, monster);
         let result = { hero: hero, monster: monster, combatLog: combatLog.split(','), victory: true }
         res.render('battle', result);
+    });
+
+    app.get('/help', async function (req, res) {
+        res.render('help');
     });
 
 };

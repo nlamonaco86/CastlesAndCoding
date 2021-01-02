@@ -27,6 +27,21 @@ let menuRoutes = [
         options: { heading: 'Where would you like to go?', src: 'https://via.placeholder.com/700x350?text=a_town', alt: 'PLACEHOLDER' },
         menuOptions: [{ option: "The Blacksmith", href: "./visit/blacksmith" }, { option: "The Inn", href: "./visit/inn" }, { option: 'Town Square', href: "./visit/townSquare" }, { option: "Main Menu", href: "/" }]
     },
+    {
+        path: '/visit/blacksmith', view: 'menu', title: "The Blacksmith",
+        options: { heading: 'What would you like to do?', src: 'https://via.placeholder.com/700x350?text=the_blacksmith', alt: 'PLACEHOLDER' },
+        menuOptions: [{ option: "Buy", href: "/visit/blacksmith/buy" }, { option: "Sell", href: "/visit/blacksmith/sell" }, { option: "Talk", href: "/visit/blacksmith/talk" }, { option: "Main Menu", href: "/" }]
+    },
+    {
+        path: '/visit/inn', view: 'menu', title: "The Inn",
+        options: { heading: 'Wat would you like to do?', src: 'https://via.placeholder.com/700x350?text=the_inn', alt: 'PLACEHOLDER' },
+        menuOptions: [{ option: "Buy", href: "/visit/inn/buy" }, { option: "Sell", href: "/visit/inn/sell" }, { option: "Talk", href: "/visit/inn/talk" }, { option: "Main Menu", href: "/" }]
+    },
+    {
+        path: '/visit/townSquare', view: 'menu', title: "Town Square",
+        options: { heading: 'What would you like to do?', src: 'https://via.placeholder.com/700x350?text=the_inn', alt: 'PLACEHOLDER' },
+        menuOptions: [{ option: "Talk", href: "/visit/townSquare/talk" }, { option: "Main Menu", href: "/" }]
+    },
 ]
 
 module.exports = menuRoutes

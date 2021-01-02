@@ -182,14 +182,24 @@ const epicShowdown = (hero, monster) => {
         }
         // Defeat :(
         if (heroLife <= 0) {
-             // push more data to the array
-             battleStatus.push(`${hero.name} was defeated by ${monster.name}!`, `${hero.name} dropped 30 gold.`, `"${hero.lastWords}"`)
-             // Create an object to display in the console
-             let monsterWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, combatLog: battleStatus, victory: false }
-             // db.Battle.create(monsterWins).then(result => { });
-            // // Lose 30 gold on death to a monster
-            transferItem(monster._id, db.Monster, hero._id, db.Hero, "penalty", 30);
-            return monsterWins;
+            // push more data to the array
+            battleStatus.push(`${hero.name} was defeated by ${monster.name}!`, `${hero.name} dropped 30 gold.`, `"${hero.lastWords}"`)
+            // Create an object to display in the console
+            let monsterWins = { hero: hero, monster: monster, announcement: `${hero.name} is battling a ${monster.name}!`, combatLog: battleStatus, victory: false }
+            // If the group is NOT a party 
+            if (Array.isArray(hero.class) === false) {
+                // create a battle record in the database, run the loot function
+                // db.Battle.create(heroWins).then(result => {
+                // });
+                transferItem(monster._id, db.Monster, hero._id, db.Hero, "penalty", 30);
+                return monsterWins;
+            }
+            // Loot is not supported for raid battles (yet)
+            else {
+                // db.Battle.create(heroWins).then(result => {
+                // });
+                return monsterWins;
+            }
         }
     };
 };
@@ -263,20 +273,26 @@ const lootMonster = (hero, monster, loot) => {
         // An exponential increment is desired - going from level 1-2 should be much shorter than lvl 17-18, etc.
         // Update the character's level and provide a 10%? bonus to all stats as a reward
         // for thief/warrior boost their weapon damage, for cleric/wizard boost their spells
-        if ( hero.xp >= hero.level * 75 ) {
-            if ( hero.class == "Warrior" || hero.class == "Thief") {
-            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
-                    blockChance: Math.round(hero.blockChance * 1.1), weapon: { name: hero.weapon.name, damageLow: Math.round(hero.weapon.damageLow * 1.2),
-                        damageHigh: Math.round(hero.weapon.damageHigh * 1.1) } }, { new: true }).then(hero => {
-                            console.log(`${hero.name} has reached level ${hero.level}!`)
-            });
-        }
-        else {
-            db.Hero.findOneAndUpdate({ _id: hero._id }, { level: Math.floor(hero.xp / 75) , hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
-                blockChance: Math.round(hero.blockChance * 1.1), spells: {name: hero.spells.name, damageLow: Math.round(hero.spells.damageLow * 1.2), damageHigh: Math.round(hero.spells.damageHigh * 1.2) } }, { new: true }).then(hero => {
-                        console.log(`${hero.name} has reached level ${hero.level}!`)
-                    });
-        }
+        if (hero.xp >= hero.level * 75) {
+            if (hero.class == "Warrior" || hero.class == "Thief") {
+                db.Hero.findOneAndUpdate({ _id: hero._id }, {
+                    level: Math.floor(hero.xp / 75), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                    blockChance: Math.round(hero.blockChance * 1.1), weapon: {
+                        name: hero.weapon.name, damageLow: Math.round(hero.weapon.damageLow * 1.2),
+                        damageHigh: Math.round(hero.weapon.damageHigh * 1.1)
+                    }
+                }, { new: true }).then(hero => {
+                    console.log(`${hero.name} has reached level ${hero.level}!`)
+                });
+            }
+            else {
+                db.Hero.findOneAndUpdate({ _id: hero._id }, {
+                    level: Math.floor(hero.xp / 75), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                    blockChance: Math.round(hero.blockChance * 1.1), spells: { name: hero.spells.name, damageLow: Math.round(hero.spells.damageLow * 1.2), damageHigh: Math.round(hero.spells.damageHigh * 1.2) }
+                }, { new: true }).then(hero => {
+                    console.log(`${hero.name} has reached level ${hero.level}!`)
+                });
+            }
         };
     });
 };
@@ -358,10 +374,11 @@ const swapItem = (model, modelWhere, swapIn) => {
     });
 };
 
-const combineModels = (selectedHeroes, partyName, _id) => {
+const combineModels = (selectedHeroes, partyName, _id, sprite) => {
     let partyOfHeroes = {
         _id: _id,
         name: partyName,
+        sprite: sprite,
         heroes: selectedHeroes.map(h => `${" "}${h.name} - Level ${h.level} ${h.class}`),
         hp: selectedHeroes.map(h => h.hp).reduce((a, b) => { return a + b; }, 0),
         xp: selectedHeroes.map(h => h.xp).reduce((a, b) => { return a + b; }, 0),
@@ -392,17 +409,17 @@ const combineModels = (selectedHeroes, partyName, _id) => {
     if (partyOfHeroes.class.includes("Warrior")) {
         // Not really sure why I have to use Math.floor here. 
         // Function returns, for example 3 * 1.1 = 3.3000000000000003 without it. That makes no sense. 
-        partyOfHeroes.armor *= Math.floor(1.1); 
+        partyOfHeroes.armor *= Math.floor(1.1);
         partyOfHeroes.blockChance *= Math.floor(1.1);
         partyOfHeroes.bonusString.push(`${" "}10% armor and block chance`);
     }
     if (partyOfHeroes.class.includes("Wizard")) {
-        partyOfHeroes.spells.damageLow *= Math.floor(1.1); 
+        partyOfHeroes.spells.damageLow *= Math.floor(1.1);
         partyOfHeroes.spells.damageHigh *= Math.floor(1.1);
         partyOfHeroes.bonusString.push(`${" "}10% spell damage`);
     }
     if (partyOfHeroes.class.includes("Thief")) {
-        partyOfHeroes.weapon.damageLow *= Math.floor(1.1); 
+        partyOfHeroes.weapon.damageLow *= Math.floor(1.1);
         partyOfHeroes.weapon.damageHigh *= Math.floor(1.1);
         partyOfHeroes.bonusString.push(`${" "}10% weapon damage`);
     }
