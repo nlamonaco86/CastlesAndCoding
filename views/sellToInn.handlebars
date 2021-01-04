@@ -2,7 +2,7 @@
 
     <div class="row justify-content-center text-center text-danger vt-lg">{{hero.name}} is selling to {{npc.name}}
     </div>
-    <div class="row justify-content-center text-danger vt-md mb-3">"Hmm..let's make a deal..."</div>
+    <div class="row justify-content-center text-danger vt-md mb-3">"I can take those unwanted items off your hands!"</div>
 
 
     <div class="row justify-content-around container">
@@ -22,7 +22,7 @@
                     <label for="sell items" class="text-center">Sell Items</label>
                     <select class="" multiple aria-label="multiple select example" id="items">
                         {{#each hero.inventory}}
-                        {{> sellObject}}
+                        {{> sellString}}
                         {{/each}}
                     </select>
                 </div>
@@ -51,11 +51,11 @@
     document.getElementById("sellBtn").addEventListener('click', (event) => {
         event.preventDefault();
 
-        let items = [...document.getElementById('items').options].filter(option => option.selected).map(option => JSON.parse(option.value))
+        let items = [...document.getElementById('items').options].filter(option => option.selected).map(option => option.value)
         console.log(items)
 
         if (items.length > 0) {
-            fetch('/api/sell/blacksmith/item/' + "{{heroId}}", {
+            fetch('/api/sell/innkeeper/item/' + "{{heroId}}", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', },
                 body: JSON.stringify(items),

@@ -208,7 +208,7 @@ module.exports = async function (app) {
                                 // filter out only the items in inventory which are weapons/armor, aka objects
                                 hero.inventory = hero.inventory.filter(item => typeof item === 'object' && !null );
                                 // assign each item a random value
-                                hero.inventory.forEach(item => Object.assign(item, {value: Math.floor(Math.random() * 20 ) } ) );
+                                hero.inventory.forEach(item => { item.name.concat(","); Object.assign(item, {value: Math.floor(Math.random() * 20 ) } );  } );
                                 res.render('sellTo', { npc: blacksmith, hero: hero, gold: hero.gold, heroId: hero._id });
                                 break;
                             default:
@@ -220,9 +220,13 @@ module.exports = async function (app) {
                     db.Npc.findOne({ type: "innkeeper" }).then(innkeeper => {
                         switch (req.params.transaction) {
                             case "buy":
-
+                               res.render('buyFromInn', { npc: innkeeper, hero: hero, gold: hero.gold, heroId: hero._id });
                                 break;
                             case "sell":
+                                // hero.inventory = hero.inventory.filter(item => typeof item !== 'object' && !null );
+                                // // assign each item a random value
+                                // hero.inventory.forEach(item => Object.assign(item, {value: Math.floor(Math.random() * 3 ) } ) );
+                                res.render('sellToInn', { npc: innkeeper, hero: hero, gold: hero.gold, heroId: hero._id });
                                 break;
                             default:
                             res.render('talkTo', { npc: innkeeper, hero: hero, statement: innkeeper.statements[Math.floor(Math.random() * innkeeper.statements.length)] });
