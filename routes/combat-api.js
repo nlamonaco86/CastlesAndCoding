@@ -32,7 +32,7 @@ const deleteModel = async function (model, where) {
 const createRandomMonster = (hero) => {
     monsterData = {
         _id: uuidv4(),
-        name: "Wretched Ooze",
+        name: "Cruel Shapeshifter",
         hp: Math.floor(Math.random() * hero.hp * 4),
         xp: Math.floor((Math.random() * hero.level) + 4),
         level: hero.level,
@@ -43,7 +43,7 @@ const createRandomMonster = (hero) => {
         blockChance: Math.floor(Math.random() * hero.blockChance * 2),
         inventory: ["disgusting slime", { name: "rusted sword", damageLow: 0, damageHigh: 2 }, "crumpled map"],
         gold: Math.floor(Math.random() * 50),
-        taunt: "A shifting blob of mysterious ooze comes forth."
+        taunt: `The strange monster closely resembles ${hero.name}`
     };
     // Ensure some "quality" among monsters, by preventing strange damage outputs
     // if max damage is higher than min, try again
@@ -170,6 +170,7 @@ const epicShowdown = (hero, monster) => {
                 // create a battle record in the database, run the loot function
                 // db.Battle.create(heroWins).then(result => {
                 // });
+                heroWins.hero.xp = heroWins.hero.xp + heroWins.monster.xp
                 lootMonster(hero, monster, loot);
                 return heroWins;
             }
@@ -269,33 +270,36 @@ const combatLog = (where) => {
 // The monster is left unmodified so that it can be re-used
 const lootMonster = (hero, monster, loot) => {
     db.Hero.findOneAndUpdate({ _id: hero._id }, { $inc: { gold: monster.gold, xp: monster.xp }, $push: { inventory: loot } }, { new: true }).then(hero => {
-        // After a victory over a monster, check to see if the character has reached a certain Xp threshold
-        // An exponential increment is desired - going from level 1-2 should be much shorter than lvl 17-18, etc.
-        // Update the character's level and provide a 10%? bonus to all stats as a reward
-        // for thief/warrior boost their weapon damage, for cleric/wizard boost their spells
-        if (hero.xp >= hero.level * 75) {
-            if (hero.class == "Warrior" || hero.class == "Thief") {
-                db.Hero.findOneAndUpdate({ _id: hero._id }, {
-                    level: Math.floor(hero.xp / 75), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
-                    blockChance: Math.round(hero.blockChance * 1.1), weapon: {
-                        name: hero.weapon.name, damageLow: Math.round(hero.weapon.damageLow * 1.2),
-                        damageHigh: Math.round(hero.weapon.damageHigh * 1.1)
-                    }
-                }, { new: true }).then(hero => {
-                    console.log(`${hero.name} has reached level ${hero.level}!`)
-                });
-            }
-            else {
-                db.Hero.findOneAndUpdate({ _id: hero._id }, {
-                    level: Math.floor(hero.xp / 75), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
-                    blockChance: Math.round(hero.blockChance * 1.1), spells: { name: hero.spells.name, damageLow: Math.round(hero.spells.damageLow * 1.2), damageHigh: Math.round(hero.spells.damageHigh * 1.2) }
-                }, { new: true }).then(hero => {
-                    console.log(`${hero.name} has reached level ${hero.level}!`)
-                });
-            }
-        };
     });
 };
+
+const levelUp = (hero) => {
+    // After a victory over a monster, check to see if the character has reached a certain Xp threshold
+    // An exponential increment is desired - going from level 1-2 should be much shorter than lvl 17-18, etc.
+    // Update the character's level and provide a 10%? bonus to all stats as a reward
+    // for thief/warrior boost their weapon damage, for cleric/wizard boost their spells
+    if (hero.xp >= hero.level * 145) {
+        if (hero.class == "Warrior" || hero.class == "Thief") {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, {
+                level: (Math.floor(hero.xp / 145) + 1), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                blockChance: Math.round(hero.blockChance * 1.1), weapon: {
+                    name: hero.weapon.name, damageLow: Math.round(hero.weapon.damageLow * 1.2),
+                    damageHigh: Math.round(hero.weapon.damageHigh * 1.1)
+                }
+            }, { new: true }).then(hero => {
+                console.log(`${hero.name} has reached level ${hero.level}!`)
+            });
+        }
+        else {
+            db.Hero.findOneAndUpdate({ _id: hero._id }, {
+                level: (Math.floor(hero.xp / 145) + 1), hp: Math.round(hero.hp * 1.1), armor: Math.round(hero.armor * 1.1), critChance: Math.round(hero.critChance * 1.1),
+                blockChance: Math.round(hero.blockChance * 1.1), spells: { name: hero.spells.name, damageLow: Math.round(hero.spells.damageLow * 1.2), damageHigh: Math.round(hero.spells.damageHigh * 1.2) }
+            }, { new: true }).then(hero => {
+                console.log(`${hero.name} has reached level ${hero.level}!`)
+            });
+        }
+    };
+}
 
 // Transfer gold or inventory between two characters
 // to reuse function in many scenarios, take in the following:
@@ -433,4 +437,4 @@ const combineModels = (selectedHeroes, partyName, _id, sprite) => {
     return partyOfHeroes
 }
 
-module.exports = { combineModels, createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, searchInventory, swapItem }
+module.exports = { combineModels, createModel, findAll, findAllWhere, findOne, updateModel, deleteModel, createRandomMonster, calcHeroDamage, calcMonsterDamage, takeChance, levelUp, heroDeath, monsterDeath, epicShowdown, chooseTwo, untilYouLose, chronicle, combatLog, transferItem, searchInventory, swapItem }

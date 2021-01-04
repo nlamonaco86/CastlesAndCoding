@@ -10,7 +10,7 @@ let menuRoutes = [
     {
         path: '/create', view: 'menu', title: "Create",
         options: { heading: 'Create', src: 'http://via.placeholder.com/700x350?text=placeholder_create_menu', alt: 'PLACEHOLDER' },
-        menuOptions: [{ option: "Hero", href: "./create/hero" }, { option: "Monster", href: "./create/monster" }, { option: 'Party', href: "./create/party" }, { option: "Dungeon", href: "./create/dungeon" }, { option: "Main Menu", href: "/" }]
+        menuOptions: [{ option: "Hero", href: "./create/hero" }, { option: "Monster", href: "./create/monster" }, { option: 'Party', href: "./create/party" }, { option: "Dungeon", href: "./create/dungeon" }, { option: "NPC", href: "./create/npc" }, { option: "Main Menu", href: "/" }]
     },
     {
         path: '/view', view: 'menu', title: "View",

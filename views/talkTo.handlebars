@@ -1,0 +1,33 @@
+<div class="container mt-5 vt" style="border:double;color:white;border-width:15px">
+
+    <div class="row justify-content-center text-danger vt-lg">{{hero.name}} is talking with {{npc.name}}</div>
+
+
+    <div class="row justify-content-around container">
+
+        <div class="col-lg-3 ">
+            <img src="{{hero.sprite}}" class="img-fluid mb-4" alt=""></img>
+        </div>
+
+        <div class="col-lg-6 vt-sm"
+            style="border:double;color:white;border-width:15px;min-height:380px;max-height:380px;overflow-y:scroll;" id="combatLog">
+            {{npc.name}} says: "{{statement}}"
+        </div>
+
+        <div class="col-lg-3 ">
+            <img src="{{npc.sprite}}" class="img-fluid mb-4" alt=""></img>
+        </div>
+
+    </div>
+
+    <div class="text-center text-danger mb-2">
+         <div class="vt-lg"><a class="a" id="speakAgain">Speak Again</a></div>
+        <div class="vt-lg"><a href="/" class="a">Main Menu</a></div>
+    </div>
+
+</div>
+<script>
+    document.getElementById('speakAgain').addEventListener('click', (event) => {
+            location.reload();
+    })
+</script>

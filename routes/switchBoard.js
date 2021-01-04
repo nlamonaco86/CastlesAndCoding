@@ -23,6 +23,11 @@ const switchBoard = (input) => {
             object.view = 'dungeonViewer';
             object.type = 'dungeon';
             break;
+            case "npc":
+                object.modelType = db.Npc;
+                object.view = 'npcViewer';
+                object.type = 'npc';
+                break;
         default:
             object.modelType = db.Hero;
             object.view = 'heroViewer';

@@ -86,6 +86,9 @@ module.exports = async function (app) {
             case "dungeon":
                 res.render('createDungeon', { title: `Create Dungeon` });
                 break;
+            case "npc":
+                res.render('createNpc', { title: `Create NPC` });
+                break;
         }
     });
 
@@ -143,6 +146,7 @@ module.exports = async function (app) {
         let monster = await db.Monster.findOne({ _id: req.params.monsterId });
         let hero = await db.Hero.findOne({ _id: req.params.heroId });
         let battle = await fn.epicShowdown(hero, monster);
+        fn.levelUp(battle.hero);
         res.render('battle', battle);
     });
 
@@ -171,11 +175,69 @@ module.exports = async function (app) {
         let monster = await fn.createRandomMonster(hero);
         let combatLog = await fn.untilYouLose(hero, monster);
         let result = { hero: hero, monster: monster, combatLog: combatLog.split(','), victory: true }
+        fn.levelUp(result.hero);
         res.render('battle', result);
     });
 
     app.get('/help', async function (req, res) {
         res.render('help');
+    });
+
+    app.get('/visit/:location/:transaction', async function (req, res) {
+        db.Hero.find({}).then(models => {
+            // Generate options based on a map of the result, plus a Main Menu link at the end
+            let data = {
+                view: 'menu', title: `${req.params.transaction} at ${req.params.location}`,
+                options: { heading: `Select a Hero`, src: `https://via.placeholder.com/700x150?text=placeholder_${req.params.Model}_image`, alt: 'A mysterious book' },
+                menuOptions: models.map(model => ({ option: `${model.name} - Level ${model.level} ${model.class}`, href: `/visit/${req.params.location}/${req.params.transaction}/${model._id}` })).concat({ option: "Go Back", href: "/visit" })
+            };
+            res.render('menu', data);
+        });
+    });
+
+    app.get('/visit/:location/:transaction/:heroId', async function (req, res) {
+        db.Hero.findOne({ _id: req.params.heroId }).then(hero => {
+            switch (req.params.location) {
+                case "blacksmith":
+                    db.Npc.findOne({ type: "blacksmith" }).then(blacksmith => {
+                        switch (req.params.transaction) {
+                            case "buy":
+                                res.render('buyFrom', { npc: blacksmith, hero: hero, gold: hero.gold, heroId: hero._id });
+                                break;
+                            case "sell":
+                                // filter out only the items in inventory which are weapons/armor, aka objects
+                                hero.inventory = hero.inventory.filter(item => typeof item === 'object' && !null );
+                                // assign each item a random value
+                                hero.inventory.forEach(item => Object.assign(item, {value: Math.floor(Math.random() * 20 ) } ) );
+                                res.render('sellTo', { npc: blacksmith, hero: hero, gold: hero.gold, heroId: hero._id });
+                                break;
+                            default:
+                            res.render('talkTo', { npc: blacksmith, hero: hero, statement: blacksmith.statements[Math.floor(Math.random() * blacksmith.statements.length)] });
+                        }
+                    })
+                    break;
+                case "inn":
+                    db.Npc.findOne({ type: "innkeeper" }).then(innkeeper => {
+                        switch (req.params.transaction) {
+                            case "buy":
+
+                                break;
+                            case "sell":
+                                break;
+                            default:
+                            res.render('talkTo', { npc: innkeeper, hero: hero, statement: innkeeper.statements[Math.floor(Math.random() * innkeeper.statements.length)] });
+                        }
+                    })
+                    break;
+                default:
+                    // select a random townsfolk, get a random statement from them, and talk to them
+                    db.Npc.find({ type: "townsfolk" }).then(results => {
+                        let Npc = results[Math.floor(Math.random() * results.length)]
+                        let statement = Npc.statements[Math.floor(Math.random() * Npc.statements.length)]
+                        res.render('talkTo', { npc: Npc, hero: hero, statement: statement });
+                    })
+            }
+        });
     });
 
 };
